@@ -1,8 +1,6 @@
 'use strict';
 // ── COMBAT ─────────────────────────────────────────────────────────────────
 // Reads global: players[], explosions[], blinkStrikes[], thrownWpns[]
-const pInBox=(px,py,b)=>px>b.x&&px<b.x+b.w&&py>b.y&&py<b.y+b.h;
-const boxOlpC=(a,b)=>a.x<b.x+b.w&&a.x+a.w>b.x&&a.y<b.y+b.h&&a.y+a.h>b.y;
 
 const doCombat=()=>{
   const alive=players.filter(p=>p.active&&p.alive);
@@ -23,7 +21,7 @@ const doCombat=()=>{
     if(pb){
       const isFire=atk.weapon==='FLAME_FISTS',isSwd=atk.weapon==='SWORD';
       for(const def of alive){
-        if(def.id===atk.id||!boxOlpC(pb,def.box()))continue;
+        if(def.id===atk.id||!boxOlp(pb,def.box()))continue;
         if(def.shielding&&def.weapon==='SHIELD'&&atk.facing!==def.facing){def.ammo--;if(def.ammo<=0)def.weapon=null;addPts(def.x,def.y-25,'#44aaff',5,3,2,.08);continue;}
         def.takeDmg(isSwd?16:isFire?13:10, atk.facing*(isSwd?8:5.5), isSwd?-9:-7, isFire);
       }
@@ -73,7 +71,7 @@ const doCombat=()=>{
   for(const tw of thrownWpns){
     if(!tw.active)continue;
     for(const def of alive){
-      if(def.id===tw.owner||!boxOlpC(tw.box(),def.box()))continue;
+      if(def.id===tw.owner||!boxOlp(tw.box(),def.box()))continue;
       def.takeDmg(18,tw.vx*.4,tw.vy*.3);addPts(tw.x,tw.y,WPN[tw.type].col,6,5,3,.15);tw.active=false;break;
     }
   }

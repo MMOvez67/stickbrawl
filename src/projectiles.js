@@ -1,9 +1,4 @@
 'use strict';
-// ── HELPERS ────────────────────────────────────────────────────────────────
-const lerp=(a,b,t)=>a+(b-a)*t;
-const pInBox=(px,py,b)=>px>b.x&&px<b.x+b.w&&py>b.y&&py<b.y+b.h;
-const rnd=(lo,hi)=>lo+Math.random()*(hi-lo);
-
 // ── EXPLOSION ──────────────────────────────────────────────────────────────
 class Explosion{
   constructor(x,y,r){this.x=x;this.y=y;this.maxR=r;this.r=0;this.life=1;this.active=true;this.hitPlayers=new Set();this.peaked=false;}
