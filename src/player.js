@@ -47,7 +47,7 @@ class Player{
     if(Math.abs(this.tumbleV)<.005&&this.onGround)this.tumble+=(0-this.tumble)*.15;
     if(this.landSquash>0)this.landSquash=Math.max(0,this.landSquash-.09);
 
-    const wpnWeight=this.weapon?WPN[this.weapon].weight:0;
+    const wpnWeight=this.weapon&&WPN[this.weapon]?WPN[this.weapon].weight:0;
     const accel=BASE_ACCEL*(1-wpnWeight*(1-HEAVY_PENALTY));
     const maxVx=BASE_MAX_VX*(1-wpnWeight*(1-HEAVY_PENALTY));
 
@@ -89,17 +89,18 @@ class Player{
     }
     this.pP=c.P;
 
-    this.vy=Math.min(this.vy+GRAV*slowmo,TERM_V);
+    const s=typeof slowmo!=='undefined'?slowmo:1;
+    this.vy=Math.min(this.vy+GRAV*s,TERM_V);
     this.vx*=this.onGround?FRIC:FRIC_AIR;
     if(Math.abs(this.vx)<.07)this.vx=0;
-    this.x+=this.vx*slowmo;
+    this.x+=this.vx*s;
     this.prevVy=this.vy;
 
     const wasGround=this.onGround;
     this.onGround=false;this.wallDir=0;
     const steps=Math.ceil(Math.abs(this.vy)/7),stepVy=this.vy/steps;
-    for(let s=0;s<steps;s++){
-      const prevY=this.y;this.y+=stepVy*slowmo;let hit=false;
+    for(let si=0;si<steps;si++){
+      const prevY=this.y;this.y+=stepVy*s;let hit=false;
       for(const p of map.plats){
         if(this.x+PW<=p.x||this.x-PW>=p.x+p.w)continue;
         if(stepVy>=0&&prevY<=p.y+2&&this.y>=p.y){

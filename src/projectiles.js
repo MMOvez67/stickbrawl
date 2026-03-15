@@ -25,13 +25,14 @@ class Bullet{
   }
   tick(){
     this.trail.push({x:this.x,y:this.y});if(this.trail.length>9)this.trail.shift();
-    if(this.type==='rocket')this.vy+=.06*slowmo;
-    else if(this.type==='sniper')this.vy+=.01*slowmo;
-    else if(this.type==='bouncer')this.vy+=.04*slowmo;
-    else if(this.type==='pellet')this.vy+=.12*slowmo;
-    else if(this.type==='minigun')this.vy+=.08*slowmo;
-    else if(this.type==='normal')this.vy+=.03*slowmo;
-    this.x+=this.vx*slowmo;this.y+=this.vy*slowmo;this.life--;
+    const s=typeof slowmo!=='undefined'?slowmo:1;
+    if(this.type==='rocket')this.vy+=.06*s;
+    else if(this.type==='sniper')this.vy+=.01*s;
+    else if(this.type==='bouncer')this.vy+=.04*s;
+    else if(this.type==='pellet')this.vy+=.12*s;
+    else if(this.type==='minigun')this.vy+=.08*s;
+    else if(this.type==='normal')this.vy+=.03*s;
+    this.x+=this.vx*s;this.y+=this.vy*s;this.life--;
     if(this.life<=0||this.x<-150||this.x>W+150||this.y<-260||this.y>H+260){this.active=false;return;}
     for(const p of map.plats){
       if(!pInBox(this.x,this.y,p))continue;
@@ -65,7 +66,7 @@ class Bullet{
 // ── GRENADE ────────────────────────────────────────────────────────────────
 class Grenade{
   constructor(x,y,vx,vy,owner){Object.assign(this,{x,y,vx,vy,owner,active:true,fuse:200,bounces:0,angle:0});}
-  tick(explosions){this.vy+=GRAV*.7*slowmo;this.vx*=.992;this.x+=this.vx*slowmo;this.y+=this.vy*slowmo;this.angle+=this.vx*.08;this.fuse--;if(this.fuse<=0){this._explode(explosions);return;}for(const p of map.plats){if(!pInBox(this.x,this.y,p))continue;if(this.vy>0){this.y=p.y-1;this.vy*=-.55;this.vx*=.7;}else{this.y=p.y+p.h+1;this.vy*=-.4;}this.bounces++;if(this.bounces>4)this._explode(explosions);break;}if(this.y>H+60)this.active=false;}
+  tick(explosions){const s=typeof slowmo!=='undefined'?slowmo:1;this.vy+=GRAV*.7*s;this.vx*=.992;this.x+=this.vx*s;this.y+=this.vy*s;this.angle+=this.vx*.08;this.fuse--;if(this.fuse<=0){this._explode(explosions);return;}for(const p of map.plats){if(!pInBox(this.x,this.y,p))continue;if(this.vy>0){this.y=p.y-1;this.vy*=-.55;this.vx*=.7;}else{this.y=p.y+p.h+1;this.vy*=-.4;}this.bounces++;if(this.bounces>4)this._explode(explosions);break;}if(this.y>H+60)this.active=false;}
   _explode(exp){if(!this.active)return;exp.push(new Explosion(this.x,this.y,85));addPts(this.x,this.y,'#ff8800',18,8,5,.14);addShake(7,12);sound('rocket');this.active=false;}
   draw(){if(!this.active)return;const blink=this.fuse<60&&Math.floor(this.fuse/6)%2===0;ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.angle);ctx.fillStyle=blink?'#ff4400':'#44aa44';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=blink?14:6;ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#888';ctx.fillRect(-2,-8,4,6);ctx.restore();}
 }
@@ -82,8 +83,9 @@ class BlinkStrike{
 class StickyBomb{
   constructor(x,y,vx,vy,owner){Object.assign(this,{x,y,vx,vy,owner,active:true,stuck:false,stuckTo:null,fuse:180});}
   tick(players,exp){
+    const s=typeof slowmo!=='undefined'?slowmo:1;
     this.fuse--;
-    if(!this.stuck){this.vy+=GRAV*.6*slowmo;this.x+=this.vx*slowmo;this.y+=this.vy*slowmo;for(const p of map.plats){if(pInBox(this.x,this.y,p)){this.stuck=true;this.vx=0;this.vy=0;break;}}for(const p of players){if(!p.active||!p.alive||p.id===this.owner)continue;if(pInBox(this.x,this.y,p.box())){this.stuck=true;this.stuckTo=p;this.vx=0;this.vy=0;break;}}}
+    if(!this.stuck){this.vy+=GRAV*.6*s;this.x+=this.vx*s;this.y+=this.vy*s;for(const p of map.plats){if(pInBox(this.x,this.y,p)){this.stuck=true;this.vx=0;this.vy=0;break;}}for(const p of players){if(!p.active||!p.alive||p.id===this.owner)continue;if(pInBox(this.x,this.y,p.box())){this.stuck=true;this.stuckTo=p;this.vx=0;this.vy=0;break;}}}
     else if(this.stuckTo?.alive){this.x=this.stuckTo.x;this.y=this.stuckTo.y-20;}
     if(this.fuse<=0){if(this.stuckTo?.alive){const dir=this.stuckTo.vx>=0?1:-1;this.stuckTo.vx+=dir*22;this.stuckTo.vy-=4;addPts(this.x,this.y,'#ff6600',14,9,5,.12);addShake(6,10);sound('rocket');}else{exp.push(new Explosion(this.x,this.y,70));addShake(5,8);sound('rocket');}this.active=false;}
     if(this.y>H+60)this.active=false;
@@ -94,7 +96,7 @@ class StickyBomb{
 // ── THROWN WEAPON ──────────────────────────────────────────────────────────
 class ThrownWpn{
   constructor(x,y,vx,vy,owner,type){Object.assign(this,{x,y,vx,vy,owner,type,active:true,angle:0,spin:vx*.06});}
-  tick(){this.vy+=GRAV*.8*slowmo;this.x+=this.vx*slowmo;this.y+=this.vy*slowmo;this.angle+=this.spin;this.vx*=.97;if(this.y>H+100)this.active=false;for(const p of map.plats){if(pInBox(this.x,this.y,p)){this.vy*=-.5;this.vx*=.5;this.spin*=.5;break;}}}
+  tick(){const s=typeof slowmo!=='undefined'?slowmo:1;this.vy+=GRAV*.8*s;this.x+=this.vx*s;this.y+=this.vy*s;this.angle+=this.spin;this.vx*=.97;if(this.y>H+100)this.active=false;for(const p of map.plats){if(pInBox(this.x,this.y,p)){this.vy*=-.5;this.vx*=.5;this.spin*=.5;break;}}}
   draw(){if(!this.active)return;const def=WPN[this.type];ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.angle);ctx.fillStyle=def.col;ctx.shadowColor=def.col;ctx.shadowBlur=10;ctx.fillRect(-10,-3,18,5);ctx.restore();}
   box(){return{x:this.x-14,y:this.y-10,w:28,h:20};}
 }

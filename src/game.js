@@ -188,8 +188,10 @@ const loop=()=>{
   if(killCamTarget&&slowmo<0.5){
     killCamZoom=Math.min(killCamZoom+0.04,2.2);
     const alivePlayer=players.find(p=>p.active&&p.alive);
-    killCamTarget.x=killCamTarget.x+(alivePlayer?.x||W/2-killCamTarget.x)*0.04;
-    killCamTarget.y=killCamTarget.y+(alivePlayer?.y||H/2-killCamTarget.y)*0.04;
+    const targetX=alivePlayer?.x||W/2;
+    const targetY=alivePlayer?.y||H/2;
+    killCamTarget.x+=(targetX-killCamTarget.x)*0.04;
+    killCamTarget.y+=(targetY-killCamTarget.y)*0.04;
   }else killCamZoom=Math.max(killCamZoom-0.06,1.0);
   const zx=killCamTarget?killCamTarget.x:W/2,zy=killCamTarget?killCamTarget.y:H/2;
   ctx.save();ctx.translate(sh.x,sh.y);ctx.translate(zx,zy);ctx.scale(killCamZoom,killCamZoom);ctx.translate(-zx,-zy);
