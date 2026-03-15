@@ -2,7 +2,7 @@
 // ── PHYSICS ────────────────────────────────────────────────────────────────
 const GRAV=.62, JUMP_V=-14.2, TERM_V=20;
 const BASE_ACCEL=1.5, BASE_MAX_VX=7, FRIC=.80, FRIC_AIR=.96;
-const HEAVY_PENALTY=0.55;
+const WEIGHT_SLOWDOWN=0.42, HEAVY_PENALTY=0.55;
 
 // ── PLAYER HITBOX ──────────────────────────────────────────────────────────
 const PW=12;   // half-width
