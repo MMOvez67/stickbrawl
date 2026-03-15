@@ -89,17 +89,17 @@ class Player{
     }
     this.pP=c.P;
 
-    this.vy=Math.min(this.vy+GRAV,TERM_V);
+    this.vy=Math.min(this.vy+GRAV*slowmo,TERM_V);
     this.vx*=this.onGround?FRIC:FRIC_AIR;
     if(Math.abs(this.vx)<.07)this.vx=0;
-    this.x+=this.vx;
+    this.x+=this.vx*slowmo;
     this.prevVy=this.vy;
 
     const wasGround=this.onGround;
     this.onGround=false;this.wallDir=0;
     const steps=Math.ceil(Math.abs(this.vy)/7),stepVy=this.vy/steps;
     for(let s=0;s<steps;s++){
-      const prevY=this.y;this.y+=stepVy;let hit=false;
+      const prevY=this.y;this.y+=stepVy*slowmo;let hit=false;
       for(const p of map.plats){
         if(this.x+PW<=p.x||this.x-PW>=p.x+p.w)continue;
         if(stepVy>=0&&prevY<=p.y+2&&this.y>=p.y){

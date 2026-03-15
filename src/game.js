@@ -9,10 +9,18 @@ let _selMap=0;
 const WIN_PHRASES = [
   'GG EZ', 'NO DIFF', 'CLAPPED', 'GET REKT', 'TOO EASY',
   'SKILL ISSUE', 'NOT EVEN CLOSE', 'OUTPLAYED', 'RATIO',
-  'BOZO', 'BUILT DIFFERENT', 'COPE', 'IT\'S GIVING W',
-  'RESPECTFULLY DEMOLISHED', 'ANIHILATED', 'GONE',
-  'LIGHTS OUT', 'DELETED', 'DONE COOKED', 'DIFF AF'
+  'BOZO', 'BUILT DIFFERENT', 'COPE', 'LIGHTS OUT', 'DELETED',
+  'DONE COOKED', 'DIFF AF', 'RESPECTFULLY DEMOLISHED',
+  'MEINE LKW MEINE PROBLEM', 'WAS IST DENN MIT KARSTEN LOS?!',
+  'NICHT MEIN PROBLEM', 'COPIUM', 'TOUCH GRASS',
+  'STAY MAD', 'SHEESH', 'BYE BYE', 'STAY LOSING'
 ];
+
+// ── SLOWMO & KILL CAM ───────────────────────────────────────────────────────
+let slowmo=1.0;
+let killCamTarget=null;
+let killCamZoom=1.0;
+let finishHimT=0;
 
 // ── MAP SELECTION ──────────────────────────────────────────────────────────
 window.selMap=i=>{
@@ -43,6 +51,7 @@ const startRound=()=>{
   // Reset all particle arrays
   pts=[];dNums=[];dusts=[];muzzles=[];shells=[];kFeed=[];
   sawAngles=map.sawblades.map(()=>0);
+  slowmo=1.0;killCamZoom=1.0;killCamTarget=null;finishHimT=0;
   roundState='intro';roundStateT=0;roundNum++;
 };
 
@@ -72,10 +81,23 @@ const checkWin=()=>{
     if(roundWinner&&roundWins[roundWinner.id]>=FT){
       finalWinner=roundWinner;
       finalWinner._phrase=WIN_PHRASES[Math.floor(Math.random()*WIN_PHRASES.length)];
-      gameState='gameover';goT=0;
+      gameState='gameover';goT=0;slowmo=1.0;killCamZoom=1.0;killCamTarget=null;finishHimT=0;
     }
-    else{roundState='roundend';roundStateT=0;}
+    else{roundState='roundend';roundStateT=0;slowmo=1.0;killCamZoom=1.0;killCamTarget=null;finishHimT=0;}
   }
+};
+
+// ── KILL CAM TRIGGER ───────────────────────────────────────────────────────
+const checkKillCamTrigger=()=>{
+  if(roundState!=='fight')return;
+  const act=players.filter(p=>p.active&&p.alive);
+  if(act.length!==1)return;
+  const lastDanger=act[0];
+  if(lastDanger.stocks!==1)return;
+  const willDie=(lastDanger.x+lastDanger.vx*45>W+60)||(lastDanger.x+lastDanger.vx*45<-60)||(lastDanger.y+lastDanger.vy*45>H+60);
+  if(willDie&&slowmo===1.0){slowmo=0.15;killCamTarget={x:lastDanger.x,y:lastDanger.y};finishHimT=1;}
+  else if(!willDie||lastDanger.stocks===0)slowmo=Math.max(slowmo-(1-slowmo)*0.08,1);
+  else if(slowmo<1)slowmo=slowmo+(1-slowmo)*0.08;
 };
 
 // ── HUD ────────────────────────────────────────────────────────────────────
@@ -158,11 +180,19 @@ const loop=()=>{
 
   if(gameState==='playing'&&roundState==='fight'){
     for(const p of players)p.tick(wpns,thrownWpns,explosions);
-    doCombat();checkWin();
+    doCombat();checkWin();checkKillCamTrigger();
     tickAllParticles();
   }
 
-  const sh=getShake();ctx.save();ctx.translate(sh.x,sh.y);
+  const sh=getShake();
+  if(killCamTarget&&slowmo<0.5){
+    killCamZoom=Math.min(killCamZoom+0.04,2.2);
+    const alivePlayer=players.find(p=>p.active&&p.alive);
+    killCamTarget.x=killCamTarget.x+(alivePlayer?.x||W/2-killCamTarget.x)*0.04;
+    killCamTarget.y=killCamTarget.y+(alivePlayer?.y||H/2-killCamTarget.y)*0.04;
+  }else killCamZoom=Math.max(killCamZoom-0.06,1.0);
+  const zx=killCamTarget?killCamTarget.x:W/2,zy=killCamTarget?killCamTarget.y:H/2;
+  ctx.save();ctx.translate(sh.x,sh.y);ctx.translate(zx,zy);ctx.scale(killCamZoom,killCamZoom);ctx.translate(-zx,-zy);
   drawMap();
   explosions.forEach(e=>e.draw());for(let i=explosions.length-1;i>=0;i--)if(!explosions[i].active)explosions.splice(i,1);
   thrownWpns.forEach(tw=>{if(tw.active)tw.draw();});for(let i=thrownWpns.length-1;i>=0;i--)if(!thrownWpns[i].active)thrownWpns.splice(i,1);
@@ -179,6 +209,7 @@ const loop=()=>{
     ctx.fillStyle=p.col;ctx.globalAlpha=.35;ctx.beginPath();ctx.arc(sp.x,sp.y-40,4,0,Math.PI*2);ctx.fill();ctx.restore();
   }
   drawKFeed();
+  if(finishHimT>0&&finishHimT<120){finishHimT++;const a=finishHimT<20?finishHimT/20:finishHimT>100?(120-finishHimT)/20:1;const s=1+Math.sin(finishHimT*0.15)*0.04;ctx.save();ctx.globalAlpha=a*0.92;ctx.textAlign='center';ctx.translate(W/2,H/2-60);ctx.scale(s,s);ctx.font='bold 68px Courier New';ctx.fillStyle='#ff2200';ctx.shadowColor='#ff0000';ctx.shadowBlur=30;ctx.fillText('FINISH HIM',0,0);ctx.restore();}
   ctx.save();ctx.globalAlpha=.18;ctx.font='bold 11px Courier New';ctx.fillStyle='#5090c0';ctx.fillText(map.name,10,16);ctx.restore();
   ctx.restore();
 
