@@ -5,6 +5,15 @@ let roundWins=[0,0,0,0],roundState='fight',roundStateT=0,roundNum=0,roundWinner=
 let gameState='title',finalWinner=null,goT=0,nP=2,frame=0,hudCache='';
 let _selMap=0;
 
+// ── VICTORY PHRASES ─────────────────────────────────────────────────────────
+const WIN_PHRASES = [
+  'GG EZ', 'NO DIFF', 'CLAPPED', 'GET REKT', 'TOO EASY',
+  'SKILL ISSUE', 'NOT EVEN CLOSE', 'OUTPLAYED', 'RATIO',
+  'BOZO', 'BUILT DIFFERENT', 'COPE', 'IT\'S GIVING W',
+  'RESPECTFULLY DEMOLISHED', 'ANIHILATED', 'GONE',
+  'LIGHTS OUT', 'DELETED', 'DONE COOKED', 'DIFF AF'
+];
+
 // ── MAP SELECTION ──────────────────────────────────────────────────────────
 window.selMap=i=>{
   _selMap=i;
@@ -60,7 +69,11 @@ const checkWin=()=>{
       roundWins[roundWinner.id]++;
       addKill(roundWinner.col,roundWinner.name,'#e63946',act.filter(p=>p.id!==roundWinner.id).map(p=>p.name).join('&'));
     }
-    if(roundWinner&&roundWins[roundWinner.id]>=FT){finalWinner=roundWinner;gameState='gameover';goT=0;}
+    if(roundWinner&&roundWins[roundWinner.id]>=FT){
+      finalWinner=roundWinner;
+      finalWinner._phrase=WIN_PHRASES[Math.floor(Math.random()*WIN_PHRASES.length)];
+      gameState='gameover';goT=0;
+    }
     else{roundState='roundend';roundStateT=0;}
   }
 };
@@ -111,8 +124,9 @@ const drawGO=()=>{
   goT++;ctx.save();ctx.globalAlpha=Math.min(goT/38,.95);ctx.fillStyle='#04090f';ctx.fillRect(0,0,W,H);ctx.restore();
   if(goT<28)return;const ta=Math.min((goT-28)/20,1);ctx.save();ctx.globalAlpha=ta;ctx.textAlign='center';
   if(finalWinner){
-    ctx.shadowColor=finalWinner.col;ctx.shadowBlur=40;ctx.fillStyle=finalWinner.col;ctx.font='bold 90px Courier New';ctx.fillText(finalWinner.name,W/2,H/2-22);
-    ctx.shadowBlur=0;ctx.fillStyle='#6a8ea8';ctx.font='22px Courier New';ctx.fillText('WINS THE MATCH — '+roundWins[finalWinner.id]+'/'+FT+' ROUNDS',W/2,H/2+26);
+    ctx.shadowColor=finalWinner.col;ctx.shadowBlur=40;ctx.fillStyle=finalWinner.col;ctx.font='bold 90px Courier New';ctx.fillText(finalWinner.name,W/2,H/2-40);
+    ctx.shadowBlur=0;ctx.fillStyle=finalWinner.col;ctx.font='bold 32px Courier New';ctx.fillText(finalWinner._phrase,W/2,H/2+12);
+    ctx.fillStyle='#6a8ea8';ctx.font='13px Courier New';ctx.fillText('— '+roundWins[finalWinner.id]+'/'+FT+' ROUNDS',W/2,H/2+42);
     if(goT>52){const cx2=W/2+260,fy2=H/2+100;ctx.strokeStyle=finalWinner.col;ctx.lineWidth=4;ctx.lineCap='round';ctx.shadowColor=finalWinner.col;ctx.shadowBlur=16;ctx.beginPath();ctx.arc(cx2,fy2-90,13,0,Math.PI*2);ctx.stroke();ctx.beginPath();ctx.moveTo(cx2,fy2-77);ctx.lineTo(cx2,fy2-44);ctx.stroke();ctx.beginPath();ctx.moveTo(cx2,fy2-44);ctx.lineTo(cx2-16,fy2);ctx.stroke();ctx.beginPath();ctx.moveTo(cx2,fy2-44);ctx.lineTo(cx2+16,fy2);ctx.stroke();ctx.beginPath();ctx.moveTo(cx2,fy2-64);ctx.lineTo(cx2-26,fy2-92);ctx.stroke();ctx.beginPath();ctx.moveTo(cx2,fy2-64);ctx.lineTo(cx2+26,fy2-92);ctx.stroke();}
   }else{ctx.fillStyle='#6a8ea8';ctx.font='bold 52px Courier New';ctx.fillText('UNENTSCHIEDEN!',W/2,H/2);}
   if(goT>95){ctx.globalAlpha=ta*(.38+Math.sin(goT*.09)*.32);ctx.font='11px Courier New';ctx.fillStyle='#2a3a4a';ctx.fillText('[ R = Neustart ]   [ ESC = Menü ]',W/2,H/2+85);}

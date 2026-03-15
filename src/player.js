@@ -27,7 +27,7 @@ class Player{
   }
 
   box(){return{x:this.x-PW,y:this.y-PH,w:PW*2,h:PH};}
-  headBox(){return{x:this.x-10,y:this.y-72,w:20,h:22};}
+  headBox(){return{x:this.x-9,y:this.y-70,w:18,h:20};}
   punchBox(){
     const isMelee=!this.weapon||this.weapon==='SWORD'||this.weapon==='FLAME_FISTS';
     if(this.atkT<=14||!isMelee)return null;
@@ -47,9 +47,13 @@ class Player{
     if(Math.abs(this.tumbleV)<.005&&this.onGround)this.tumble+=(0-this.tumble)*.15;
     if(this.landSquash>0)this.landSquash=Math.max(0,this.landSquash-.09);
 
+    const wpnWeight=this.weapon?WPN[this.weapon].weight:0;
+    const accel=BASE_ACCEL*(1-wpnWeight*(1-HEAVY_PENALTY));
+    const maxVx=BASE_MAX_VX*(1-wpnWeight*(1-HEAVY_PENALTY));
+
     const c=this.getInput();
-    if(c.L){this.vx-=ACCEL;this.facing=-1;}if(c.R){this.vx+=ACCEL;this.facing=1;}
-    this.vx=clamp(this.vx,-MAX_VX,MAX_VX);
+    if(c.L){this.vx-=accel;this.facing=-1;}if(c.R){this.vx+=accel;this.facing=1;}
+    this.vx=clamp(this.vx,-maxVx,maxVx);
 
     const canJump=this.jumpsLeft>0||this.coyoteT>0;
     if(c.U&&!this.pJ){
@@ -134,7 +138,7 @@ class Player{
     else if(this.weapon==='SHOTGUN'){for(let i=-2;i<=2;i++)this.bullets.push(new Bullet(bx,by,this.facing*12,i*2,this.id,'pellet'));addMuzzle(bx,by,this.facing);this.vx-=this.facing*5.5;this.vy-=1.5;this._useAmmo(24,24);sound('shotgun');addShake(4,6);}
     else if(this.weapon==='ROCKET'){this.bullets.push(new Bullet(this.x+this.facing*26,by,this.facing*7,-.5,this.id,'rocket'));addMuzzle(this.x+this.facing*26,by,this.facing);this.vx-=this.facing*2.5;this._useAmmo(50,50);addShake(2,4);}
     else if(this.weapon==='BOUNCER'){this.bullets.push(new Bullet(bx,by,this.facing*13,Math.random()*2-1,this.id,'bouncer'));addMuzzle(bx,by,this.facing);addShell(this.x+this.facing*8,by,this.facing);this._useAmmo(14,14);sound('shoot');}
-    else if(this.weapon==='SNIPER'){this.bullets.push(new Bullet(bx,by,this.facing*28,0,this.id,'sniper'));addMuzzle(bx,by,this.facing);this.vx-=this.facing*3.5;this._useAmmo(30,30);sound('sniper');addShake(5,8);}
+    else if(this.weapon==='SNIPER'){this.bullets.push(new Bullet(bx,by,this.facing*32,0,this.id,'sniper'));addMuzzle(bx,by,this.facing);this.vx-=this.facing*3.5;this._useAmmo(30,30);sound('sniper');addShake(5,8);}
     else if(this.weapon==='GRENADE'){grenades.push(new Grenade(this.x+this.facing*18,by,this.facing*8+this.vx*.3,-9,this.id));this._useAmmo(20,28);sound('shoot');}
     else if(this.weapon==='BLINK_DAGGER'){blinkStrikes.push(new BlinkStrike(this.x,by,this.facing,this.id));this.x+=this.facing*200;addDustCloud(this.x,by,this.col,true);addPts(this.x,by,'#ff44ff',8,5,3,.12);this._useAmmo(18,40);sound('sniper');}
     else if(this.weapon==='THRUSTER'){stickyBombs.push(new StickyBomb(this.x+this.facing*18,by,this.facing*10,-2,this.id));this._useAmmo(16,22);sound('shoot');}

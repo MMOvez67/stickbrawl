@@ -6,18 +6,18 @@
 // 3. Add hand-weapon visual in player.js _drawHandWpn()
 // 4. Add pickup icon in WpnItem.draw() below
 const WPN={
-  PISTOL:      {name:'PISTOL',    col:'#99aaaa', ammo:15},
-  SHOTGUN:     {name:'SHOTGUN',   col:'#cc8833', ammo:6},
-  ROCKET:      {name:'ROCKET',    col:'#cc3333', ammo:3},
-  BOUNCER:     {name:'BOUNCER',   col:'#cc44ff', ammo:8},
-  SNIPER:      {name:'SNIPER',    col:'#44ffcc', ammo:4},
-  MINIGUN:     {name:'MINIGUN',   col:'#ff9900', ammo:30},
-  GRENADE:     {name:'GRENADE',   col:'#44cc44', ammo:4},
-  BLINK_DAGGER:{name:'BLINK DGR', col:'#ff44ff', ammo:3},
-  THRUSTER:    {name:'THRUSTER',  col:'#ff9900', ammo:5},
-  SWORD:       {name:'SWORD',     col:'#88aaff', ammo:7},
-  FLAME_FISTS: {name:'FLAME FX',  col:'#ff5500', ammo:8},
-  SHIELD:      {name:'SHIELD',    col:'#44aaff', ammo:14},
+  PISTOL:      {name:'PISTOL',    col:'#99aaaa', ammo:15, weight:0.3},
+  SHOTGUN:     {name:'SHOTGUN',   col:'#cc8833', ammo:6, weight:0.7},
+  ROCKET:      {name:'ROCKET',    col:'#cc3333', ammo:3, weight:0.9},
+  BOUNCER:     {name:'BOUNCER',   col:'#cc44ff', ammo:8, weight:0.5},
+  SNIPER:      {name:'SNIPER',    col:'#44ffcc', ammo:4, weight:0.8},
+  MINIGUN:     {name:'MINIGUN',   col:'#ff9900', ammo:30, weight:1.0},
+  GRENADE:     {name:'GRENADE',   col:'#44cc44', ammo:4, weight:0.4},
+  BLINK_DAGGER:{name:'BLINK DGR', col:'#ff44ff', ammo:3, weight:0.1},
+  THRUSTER:    {name:'THRUSTER',  col:'#ff9900', ammo:5, weight:0.6},
+  SWORD:       {name:'SWORD',     col:'#88aaff', ammo:7, weight:0.7},
+  FLAME_FISTS: {name:'FLAME FX',  col:'#ff5500', ammo:8, weight:0.2},
+  SHIELD:      {name:'SHIELD',    col:'#44aaff', ammo:14, weight:0.85},
 };
 const WPN_KEYS=Object.keys(WPN);
 

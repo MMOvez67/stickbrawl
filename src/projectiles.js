@@ -25,7 +25,12 @@ class Bullet{
   }
   tick(){
     this.trail.push({x:this.x,y:this.y});if(this.trail.length>9)this.trail.shift();
-    if(this.type==='rocket')this.vy+=.08;
+    if(this.type==='rocket')this.vy+=.06;
+    else if(this.type==='sniper')this.vy+=.01;
+    else if(this.type==='bouncer')this.vy+=.04;
+    else if(this.type==='pellet')this.vy+=.12;
+    else if(this.type==='minigun')this.vy+=.08;
+    else if(this.type==='normal')this.vy+=.03;
     this.x+=this.vx;this.y+=this.vy;this.life--;
     if(this.life<=0||this.x<-150||this.x>W+150||this.y<-260||this.y>H+260){this.active=false;return;}
     for(const p of map.plats){
