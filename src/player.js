@@ -69,12 +69,12 @@ class Player{
     if(c.A&&!this.shielding){
       if(this.weapon==='MINIGUN'){
         this.minigunHeld++;
-        if(this.atkCD===0&&this.minigunHeld>3){
+        if(this.atkCD<=0&&this.minigunHeld>3){
           this.bullets.push(new Bullet(this.x+this.facing*22,this.y-36,this.facing*(14+(Math.random()*2-1)),Math.random()*2-1,this.id,'minigun'));
           this.vx-=this.facing*.6;addMuzzle(this.x+this.facing*22,this.y-36,this.facing);addShell(this.x+this.facing*8,this.y-36,this.facing);
           this._useAmmo(4,6);sound('shoot');
         }
-      }else if(!this.pA&&this.atkCD===0)this._doAttack();
+      }else if(!this.pA&&this.atkCD<=0)this._doAttack();
     }else this.minigunHeld=0;
     this.pA=c.A;
 
