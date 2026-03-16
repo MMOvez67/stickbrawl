@@ -203,6 +203,7 @@ const loop=(timestamp)=>{
     killCamTarget.y+=(targetY-killCamTarget.y)*0.04;
   }else killCamZoom=Math.max(killCamZoom-0.06,1.0);
   const zx=killCamTarget?killCamTarget.x:W/2,zy=killCamTarget?killCamTarget.y:H/2;
+  ctx.save();ctx.setTransform(1,0,0,1,0,0);ctx.clearRect(0,0,W,H);ctx.restore();
   ctx.save();ctx.translate(sh.x,sh.y);ctx.translate(zx,zy);ctx.scale(killCamZoom,killCamZoom);ctx.translate(-zx,-zy);
   drawMap();
   explosions.forEach(e=>e.draw());for(let i=explosions.length-1;i>=0;i--)if(!explosions[i].active)explosions.splice(i,1);
