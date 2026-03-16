@@ -58,7 +58,7 @@ class Bullet{
 class Grenade{
   constructor(x,y,vx,vy,owner){Object.assign(this,{x,y,vx,vy,owner,active:true,fuse:200,bounces:0,angle:0});}
   tick(dt=1,explosions){const s=typeof slowmo!=='undefined'?slowmo:1;this.vy+=GRAV*.7*dt*s;this.vx*=Math.pow(.992,dt);this.x+=this.vx*dt*s;this.y+=this.vy*dt*s;this.angle+=this.vx*.08;this.fuse-=dt;if(this.fuse<=0){this._explode(explosions);return;}for(const p of map.plats){if(!pInBox(this.x,this.y,p))continue;if(this.vy>0){this.y=p.y-1;this.vy*=-.55;this.vx*=.7;}else{this.y=p.y+p.h+1;this.vy*=-.4;}this.bounces++;if(this.bounces>4)this._explode(explosions);break;}if(this.y>H+60)this.active=false;}
-  _explode(exp){if(!this.active)return;exp.push(new Explosion(this.x,this.y,85));addPts(this.x,this.y,'#ff8800',18,8,5,.14);addShake(7,12);sound('rocket');this.active=false;}
+  _explode(exp){if(!this.active)return;exp.push(new Explosion(this.x,this.y,85));addPts(this.x,this.y,'#ff8800',18,8,5,.14);addShake(2,8);sound('rocket');this.active=false;}
   draw(){if(!this.active)return;const blink=this.fuse<60&&Math.floor(this.fuse/6)%2===0;ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.angle);ctx.fillStyle=blink?'#ff4400':'#44aa44';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=blink?14:6;ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#888';ctx.fillRect(-2,-8,4,6);ctx.restore();}
 }
 
@@ -78,7 +78,7 @@ class StickyBomb{
     this.fuse-=dt;
     if(!this.stuck){this.vy+=GRAV*.6*dt*s;this.x+=this.vx*dt*s;this.y+=this.vy*dt*s;for(const p of map.plats){if(pInBox(this.x,this.y,p)){this.stuck=true;this.vx=0;this.vy=0;break;}}for(const p of players){if(!p.active||!p.alive||p.id===this.owner)continue;if(pInBox(this.x,this.y,p.box())){this.stuck=true;this.stuckTo=p;this.vx=0;this.vy=0;break;}}}
     else if(this.stuckTo?.alive){this.x=this.stuckTo.x;this.y=this.stuckTo.y-20;}
-    if(this.fuse<=0){if(this.stuckTo?.alive){const dir=this.stuckTo.vx>=0?1:-1;this.stuckTo.vx+=dir*22;this.stuckTo.vy-=4;addPts(this.x,this.y,'#ff6600',14,9,5,.12);addShake(6,10);sound('rocket');}else{exp.push(new Explosion(this.x,this.y,70));addShake(5,8);sound('rocket');}this.active=false;}
+    if(this.fuse<=0){if(this.stuckTo?.alive){const dir=this.stuckTo.vx>=0?1:-1;this.stuckTo.vx+=dir*22;this.stuckTo.vy-=4;addPts(this.x,this.y,'#ff6600',14,9,5,.12);addShake(2,6);sound('rocket');}else{exp.push(new Explosion(this.x,this.y,70));addShake(2,6);sound('rocket');}this.active=false;}
     if(this.y>H+60)this.active=false;
   }
   draw(){if(!this.active)return;const blink=this.fuse<60&&Math.floor(this.fuse/5)%2===0;ctx.save();ctx.translate(this.x,this.y);ctx.fillStyle=blink?'#ff4400':'#ff9900';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=blink?16:8;ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();ctx.strokeStyle='#222';ctx.lineWidth=1.5;ctx.beginPath();ctx.moveTo(-3,-3);ctx.lineTo(3,3);ctx.moveTo(3,-3);ctx.lineTo(-3,3);ctx.stroke();ctx.restore();}

@@ -46,7 +46,7 @@ const doCombat=()=>{
           if(!pInBox(bul.x,bul.y,def.box())&&!isHead)continue;
           bul.pierced.add(def.id);
           def.takeDmg(40,bul.vx>0?10:-10,-4,false,isHead);
-          addPts(bul.x,bul.y,def.col,10,6,4,.15);addShake(5,10);continue;
+          addPts(bul.x,bul.y,def.col,10,6,4,.15);addShake(2,6);continue;
         }
         if(!pInBox(bul.x,bul.y,def.box())&&!isHead)continue;
         const dmgMap={normal:16,pellet:11,rocket:32,bouncer:18,minigun:8};
@@ -86,7 +86,7 @@ const doCombat=()=>{
     if(!bs.active)continue;const tip=bs.tip();
     for(const def of alive){
       if(def.id===bs.owner||!pInBox(tip.x,tip.y,def.box()))continue;
-      def.takeDmg(55,bs.facing*14,-8);addPts(tip.x,tip.y,'#ff44ff',12,7,4,.1);addShake(6,10);bs.active=false;break;
+      def.takeDmg(55,bs.facing*14,-8);addPts(tip.x,tip.y,'#ff44ff',12,7,4,.1);addShake(3,8);bs.active=false;break;
     }
   }
 };

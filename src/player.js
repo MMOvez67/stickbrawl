@@ -78,6 +78,7 @@ class Player{
     }else this.minigunHeld=0;
     this.pA=c.A;
 
+    if(c.P&&!this.pP&&this.weapon)this.chargeT=0;
     if(c.P&&this.weapon)this.chargeT+=dt;
     if(!c.P&&this.pP&&this.weapon){
       const chargeMult=1+Math.min(this.chargeT/120,1);
@@ -124,7 +125,7 @@ class Player{
 
     for(const b of this.bullets){
       if(!b.active||b.type!=='rocket')continue;
-      for(const p of map.plats){if(pInBox(b.x,b.y,p)){explosions.push(new Explosion(b.x,b.y,100));addPts(b.x,b.y,'#ff6600',22,9,6,.12);addShake(8,12);sound('rocket');b.active=false;break;}}
+      for(const p of map.plats){if(pInBox(b.x,b.y,p)){explosions.push(new Explosion(b.x,b.y,100));addPts(b.x,b.y,'#ff6600',22,9,6,.12);addShake(2,8);sound('rocket');b.active=false;break;}}
     }
     for(const sb of map.sawblades){
       if(dist(this.x,this.y-PH*.5,sb.x,sb.y)<sb.r+8){const dx=this.x-sb.x,dy=(this.y-PH*.5)-sb.y,n=Math.max(dist(this.x,this.y-PH*.5,sb.x,sb.y),.1);this.takeDmg(3,(dx/n)*5,(dy/n)*5);}
@@ -145,10 +146,10 @@ class Player{
     const bx=this.x+this.facing*22,by=this.y-36;
     if(!this.weapon){this.atkT=24;this.atkCD=26;sound('hit');}
     else if(this.weapon==='PISTOL'){const{vx,vy}=this._getAimVector(15);this.bullets.push(new Bullet(bx,by,vx,vy,this.id,'normal'));addMuzzle(bx,by,this.facing);addShell(this.x+this.facing*8,by,this.facing);this._useAmmo(10,10);sound('shoot');}
-    else if(this.weapon==='SHOTGUN'){const aim=this._getAimVector(12);const angle=Math.atan2(aim.vy,aim.vx);for(let i=-2;i<=2;i++){const spread=i*0.12;this.bullets.push(new Bullet(bx,by,Math.cos(angle+spread)*12,Math.sin(angle+spread)*12,this.id,'pellet'));}addMuzzle(bx,by,this.facing);this.vx-=this.facing*5.5;this.vy-=1.5;this._useAmmo(24,24);sound('shotgun');addShake(4,6);}
+    else if(this.weapon==='SHOTGUN'){const aim=this._getAimVector(12);const angle=Math.atan2(aim.vy,aim.vx);for(let i=-2;i<=2;i++){const spread=i*0.12;this.bullets.push(new Bullet(bx,by,Math.cos(angle+spread)*12,Math.sin(angle+spread)*12,this.id,'pellet'));}addMuzzle(bx,by,this.facing);this.vx-=this.facing*5.5;this.vy-=1.5;this._useAmmo(24,24);sound('shotgun');addShake(2,4);}
     else if(this.weapon==='ROCKET'){const{vx:rvx,vy:rvy}=this._getAimVector(7);this.bullets.push(new Bullet(this.x+this.facing*26,by,rvx,rvy,this.id,'rocket'));addMuzzle(this.x+this.facing*26,by,this.facing);this.vx-=this.facing*2.5;this._useAmmo(50,50);addShake(2,4);}
     else if(this.weapon==='BOUNCER'){const{vx:bvx,vy:bvy}=this._getAimVector(13);this.bullets.push(new Bullet(bx,by,bvx,bvy,this.id,'bouncer'));addMuzzle(bx,by,this.facing);addShell(this.x+this.facing*8,by,this.facing);this._useAmmo(14,14);sound('shoot');}
-    else if(this.weapon==='SNIPER'){const{vx:svx,vy:svy}=this._getAimVector(32);this.bullets.push(new Bullet(bx,by,svx,svy,this.id,'sniper'));addMuzzle(bx,by,this.facing);this.vx-=this.facing*3.5;this._useAmmo(30,30);sound('sniper');addShake(5,8);}
+    else if(this.weapon==='SNIPER'){const{vx:svx,vy:svy}=this._getAimVector(32);this.bullets.push(new Bullet(bx,by,svx,svy,this.id,'sniper'));addMuzzle(bx,by,this.facing);this.vx-=this.facing*3.5;this._useAmmo(30,30);sound('sniper');addShake(2,6);}
     else if(this.weapon==='MINIGUN'){const{vx:mvx,vy:mvy}=this._getAimVector(14);const mAngle=Math.atan2(mvy,mvx);const mSpread=(Math.random()-.5)*.15;this.bullets.push(new Bullet(bx,by,Math.cos(mAngle+mSpread)*14,Math.sin(mAngle+mSpread)*14,this.id,'minigun'));this.vx-=this.facing*.6;addMuzzle(bx,by,this.facing);addShell(this.x+this.facing*8,by,this.facing);this._useAmmo(4,6);sound('shoot');}
     else if(this.weapon==='GRENADE'){const aim=this._getAimVector(8);grenades.push(new Grenade(this.x+this.facing*18,by,aim.vx,aim.vy-2,this.id));this._useAmmo(20,28);sound('shoot');}
     else if(this.weapon==='BLINK_DAGGER'){blinkStrikes.push(new BlinkStrike(this.x,by,this.facing,this.id));this.x+=this.facing*200;addDustCloud(this.x,by,this.col,true);addPts(this.x,by,'#ff44ff',8,5,3,.12);this._useAmmo(18,40);sound('sniper');}
@@ -168,7 +169,7 @@ class Player{
     if(flaming)this.burning=120;
     if(Math.abs(kbx)>4||Math.abs(kby)>6)this.tumbleV=(kbx>0?1:-1)*(Math.random()*.23+.15);
     addDmgNum(this.x+(Math.random()*20-10),this.y-PH-5,Math.round(finalAmt),this.col,headshot);
-    sound(headshot?'headshot':'hit');addShake(headshot?5:2,headshot?10:5);
+    sound(headshot?'headshot':'hit');addShake(headshot?3:1.5,headshot?8:4);
     if(this.hp<=0)this._die();
     return true;
   }
@@ -178,7 +179,7 @@ class Player{
     this.alive=false;this.weapon=null;this.ammo=0;this.burning=0;
     this.tumbleV=(Math.random()-0.5)*1.2;this.tumble=Math.random()*Math.PI*2;
     addPts(this.x,this.y-25,this.col,20,9,5,.2);addBlood(this.x,this.y-30,this.col,8);
-    addShake(7,14);sound('die');
+    addShake(3,10);sound('die');
   }
 
   _spawn(){
