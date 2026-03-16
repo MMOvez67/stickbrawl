@@ -25,6 +25,15 @@ body{background:#060810;display:flex;flex-direction:column;align-items:center;ju
 .mbtns label{font-size:11px;color:#1a2a3a;letter-spacing:1px;}
 .pbtn{background:#0f1c2e;color:#7aa0c0;border:1px solid #1a3050;padding:11px 22px;font-size:15px;font-family:'Courier New',monospace;font-weight:bold;cursor:pointer;letter-spacing:2px;}
 .pbtn:hover{background:#FF6B00;border-color:#FF6B00;color:#fff;}.pbtn:active{transform:scale(.97);}
+/* Tabs */
+.tabs{display:flex;gap:0;margin-bottom:8px;}
+.tab{background:#0f1c2e;color:#3a556a;border:1px solid #111e2e;padding:8px 22px;font-size:11px;font-family:'Courier New',monospace;letter-spacing:2px;cursor:pointer;}
+.tab.active{background:#1c3248;color:#c8dff5;border-color:#5090c0;}
+.tab-content{display:none;}.tab-content.active{display:flex;flex-direction:column;align-items:center;gap:8px;}
+.ctrl-table{width:580px;border-collapse:collapse;}
+.ctrl-table td{padding:5px 14px;font-size:10px;color:#3a556a;border-bottom:1px solid #111e2e;}
+.ctrl-table td:first-child{color:#c8dff5;width:100px;}
+.ctrl-table tr:hover td{background:#0b1623;}
 </style>
 </head>
 <body>
@@ -32,35 +41,60 @@ body{background:#060810;display:flex;flex-direction:column;align-items:center;ju
   <canvas id="gc" width="1200" height="600"></canvas>
   <div id="hud"></div>
   <div id="ts">
-    <div class="tag">v5 · physics edition</div>
+    <div class="tag">v5.4 · HP System</div>
     <h1>STICK<span style="color:#FF6B00">BRAWL</span></h1>
-    <div class="cgrid">
-      <div class="cc" style="border-color:#e63946;"><strong style="color:#e63946">▌ P1 — ROT</strong>WASD · F=Angriff · G=Aufheben/Werfen</div>
-      <div class="cc" style="border-color:#457b9d;"><strong style="color:#457b9d">▌ P2 — BLAU</strong>Pfeiltasten · ENTER=Angriff · RSHIFT=Aufheben</div>
-      <div class="cc" style="border-color:#2d9f2d;"><strong style="color:#2d9f2d">▌ P3 — GRÜN</strong>IJKL · H=Angriff · Y=Aufheben</div>
-      <div class="cc" style="border-color:#d4850a;"><strong style="color:#d4850a">▌ P4 — ORANGE</strong>Gamepad · A=Jump · X=Angriff · B=Aufheben</div>
+    <div class="tabs">
+      <button class="tab active" onclick="switchTab(0)">SPIELEN</button>
+      <button class="tab" onclick="switchTab(1)">CONTROLS</button>
     </div>
-    <div class="wpngrid">
-      <div class="wc"><b>PISTOL</b> tracer</div><div class="wc"><b>SHOTGUN</b> recoil-jump</div>
-      <div class="wc"><b>ROCKET</b> AoE</div><div class="wc"><b>BOUNCER</b> ricochet</div>
-      <div class="wc"><b>SNIPER</b> pierce+headshot</div><div class="wc"><b>MINIGUN</b> hold</div>
-      <div class="wc"><b>GRENADE</b> arc</div><div class="wc"><b>BLINK DGR</b> teleport</div>
-      <div class="wc"><b>THRUSTER</b> sticky</div><div class="wc"><b>SWORD</b> melee</div>
-      <div class="wc"><b>FLAME FX</b> DoT</div><div class="wc"><b>SHIELD</b> reflect</div>
+    <div id="tab0" class="tab-content active">
+      <div class="cgrid">
+        <div class="cc" style="border-color:#e63946;"><strong style="color:#e63946">▌ P1 — ROT</strong>WASD · F=Angriff · G=Aufheben/Werfen</div>
+        <div class="cc" style="border-color:#457b9d;"><strong style="color:#457b9d">▌ P2 — BLAU</strong>Pfeiltasten · ENTER=Angriff · RSHIFT=Aufheben</div>
+        <div class="cc" style="border-color:#2d9f2d;"><strong style="color:#2d9f2d">▌ P3 — GRÜN</strong>IJKL · H=Angriff · Y=Aufheben</div>
+        <div class="cc" style="border-color:#d4850a;"><strong style="color:#d4850a">▌ P4 — ORANGE</strong>Gamepad · A=Jump · X=Angriff · B=Aufheben</div>
+      </div>
+      <div class="wpngrid">
+        <div class="wc"><b>PISTOL</b> tracer</div><div class="wc"><b>SHOTGUN</b> spread</div>
+        <div class="wc"><b>ROCKET</b> AoE</div><div class="wc"><b>BOUNCER</b> ricochet</div>
+        <div class="wc"><b>SNIPER</b> pierce+headshot</div><div class="wc"><b>MINIGUN</b> hold</div>
+        <div class="wc"><b>GRENADE</b> arc</div><div class="wc"><b>BLINK DGR</b> teleport</div>
+        <div class="wc"><b>THRUSTER</b> sticky</div><div class="wc"><b>SWORD</b> melee</div>
+        <div class="wc"><b>FLAME FX</b> DoT</div><div class="wc"><b>SHIELD</b> reflect</div>
+      </div>
+      <div class="mbtns"><label>SPIELER:</label>
+        <button class="pbtn" onclick="startGame(2)">2P</button>
+        <button class="pbtn" onclick="startGame(3)">3P</button>
+        <button class="pbtn" onclick="startGame(4)">4P</button>
+      </div>
+      <div class="mbtns" style="margin-top:2px;"><label>MAP:</label>
+        <button class="pbtn" id="mb0" onclick="selMap(0)" style="background:#1c3248;border-color:#5090c0;">ROOFTOPS</button>
+        <button class="pbtn" id="mb1" onclick="selMap(1)">CASTLE</button>
+        <button class="pbtn" id="mb2" onclick="selMap(2)">ABYSS</button>
+        <button class="pbtn" id="mb3" onclick="selMap(3)">NEON CITY</button>
+        <button class="pbtn" id="mb4" onclick="selMap(4)">RANDOM</button>
+      </div>
     </div>
-    <div class="mbtns"><label>SPIELER:</label>
-      <button class="pbtn" onclick="startGame(2)">2P</button>
-      <button class="pbtn" onclick="startGame(3)">3P</button>
-      <button class="pbtn" onclick="startGame(4)">4P</button>
-    </div>
-    <div class="mbtns" style="margin-top:2px;"><label>MAP:</label>
-      <button class="pbtn" id="mb0" onclick="selMap(0)" style="background:#1c3248;border-color:#5090c0;">ROOFTOPS</button>
-      <button class="pbtn" id="mb1" onclick="selMap(1)">CASTLE</button>
-      <button class="pbtn" id="mb2" onclick="selMap(2)">ABYSS</button>
-      <button class="pbtn" id="mb3" onclick="selMap(3)">NEON CITY</button>
-      <button class="pbtn" id="mb4" onclick="selMap(4)">RANDOM</button>
+    <div id="tab1" class="tab-content">
+      <table class="ctrl-table">
+        <tr><td>P1 ROT</td><td>WASD=Bewegen | F=Angriff | G=Aufheben/Werfen</td></tr>
+        <tr><td>P2 BLAU</td><td>PFEILTASTEN | ENTER=Angriff | RSHIFT=Aufheben</td></tr>
+        <tr><td>P3 GRÜN</td><td>IJKL=Bewegen | H=Angriff | Y=Aufheben</td></tr>
+        <tr><td>P4 ORANGE</td><td>GAMEPAD | A=Sprung | X=Angriff | B=Aufheben</td></tr>
+        <tr style="background:#0b1623;"><td colspan="2"></td></tr>
+        <tr><td>ALLGEMEIN</td><td>Doppelsprung | Wandsprung | Waffe werfen (G bei Waffe)</td></tr>
+        <tr><td>SHIELD</td><td>Angriff halten = blockt Schüsse von vorn</td></tr>
+        <tr><td>BLINK DGR</td><td>Teleport 200px vorwärts | tötet alles auf dem Weg</td></tr>
+        <tr><td>THRUSTER</td><td>Klebt an Gegnern | schleudert nach 3s weg</td></tr>
+      </table>
     </div>
   </div>
+  <script>
+    function switchTab(idx){
+      document.querySelectorAll('.tab').forEach((t,i)=>t.classList.toggle('active',i===idx));
+      document.querySelectorAll('.tab-content').forEach((t,i)=>t.classList.toggle('active',i===idx));
+    }
+  </script>
 </div>
 
 <script>

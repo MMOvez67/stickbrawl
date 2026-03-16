@@ -1,7 +1,7 @@
 'use strict';
 // ── PHYSICS ────────────────────────────────────────────────────────────────
-const GRAV=.62, JUMP_V=-14.2, TERM_V=20;
-const BASE_ACCEL=1.5, BASE_MAX_VX=7, FRIC=.80, FRIC_AIR=.96;
+const GRAV=0.45, JUMP_V=-12.5, TERM_V=16;
+const BASE_ACCEL=0.95, BASE_MAX_VX=4.8, FRIC=0.78, FRIC_AIR=0.94;
 const WEIGHT_SLOWDOWN=0.42, HEAVY_PENALTY=0.55;
 
 // ── PLAYER HITBOX ──────────────────────────────────────────────────────────

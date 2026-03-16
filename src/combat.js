@@ -23,7 +23,9 @@ const doCombat=()=>{
       for(const def of alive){
         if(def.id===atk.id||!boxOlp(pb,def.box()))continue;
         if(def.shielding&&def.weapon==='SHIELD'&&atk.facing!==def.facing){def.ammo--;if(def.ammo<=0)def.weapon=null;addPts(def.x,def.y-25,'#44aaff',5,3,2,.08);continue;}
-        def.takeDmg(isSwd?16:isFire?13:10, atk.facing*(isSwd?8:5.5), isSwd?-9:-7, isFire);
+        const kbx=isSwd?atk.facing*6.0:isFire?atk.facing*4.0:atk.facing*4.5;
+        const kby=isSwd?-7.0:isFire?-5.0:-5.5;
+        def.takeDmg(isSwd?16:isFire?13:10, kbx, kby, isFire);
       }
     }
 
@@ -43,13 +45,16 @@ const doCombat=()=>{
           if(bul.pierced.has(def.id))continue;
           if(!pInBox(bul.x,bul.y,def.box())&&!isHead)continue;
           bul.pierced.add(def.id);
-          def.takeDmg(40,bul.vx>0?10:-10,-3,false,isHead);
+          def.takeDmg(40,bul.vx>0?10:-10,-4,false,isHead);
           addPts(bul.x,bul.y,def.col,10,6,4,.15);addShake(5,10);continue;
         }
         if(!pInBox(bul.x,bul.y,def.box())&&!isHead)continue;
         const dmgMap={normal:16,pellet:11,rocket:32,bouncer:18,minigun:8};
-        const kb=bul.vx>0?7.5:-7.5;
-        if(def.takeDmg(dmgMap[bul.type]||12,kb,-4,bul.type==='flame',isHead)){
+        const kbxMap={normal:5.5,pellet:3.5,rocket:9.0,bouncer:6.0,minigun:2.5,flame:5.5};
+        const kbx=bul.vx>0?kbxMap[bul.type]||5.5:-(kbxMap[bul.type]||5.5);
+        const kbyMap={normal:-3.5,pellet:-2.5,rocket:-8.0,bouncer:-4.0,minigun:-1.5,flame:-3.5};
+        const kby=kbyMap[bul.type]||-3.5;
+        if(def.takeDmg(dmgMap[bul.type]||12,kbx,kby,bul.type==='flame',isHead)){
           if(bul.type!=='rocket')addPts(bul.x,bul.y,def.col,8);
           bul.active=false;
         }
