@@ -95,7 +95,8 @@ const checkKillCamTrigger=(dt=1)=>{
   const lastDanger=act[0];
   const pred=45*dt;
   const willDie=(lastDanger.x+lastDanger.vx*pred>W+60)||(lastDanger.x+lastDanger.vx*pred<-60)||(lastDanger.y+lastDanger.vy*pred>H+60);
-  if(willDie&&slowmo===1.0){slowmo=0.15;killCamTarget={x:lastDanger.x,y:lastDanger.y};finishHimT=1;}
+  const inFinalKill=lastDanger.hp<=25&&lastDanger.hitT>14&&willDie;
+  if(inFinalKill&&slowmo===1.0){slowmo=0.15;killCamTarget={x:lastDanger.x,y:lastDanger.y};finishHimT=1;}
   else if(!willDie)slowmo=Math.max(slowmo-(1-slowmo)*0.08,1);
   else if(slowmo<1)slowmo=slowmo+(1-slowmo)*0.08;
 };
