@@ -43,7 +43,7 @@ const spawnWpn=i=>{
 const startRound=()=>{
   players.forEach(p=>{
     if(!p.active)return;
-    Object.assign(p,{x:SPAWNS[p.id].x,y:SPAWNS[p.id].y,vx:0,vy:0,dmg:0,stocks:3,alive:true,iF:180,
+    Object.assign(p,{x:SPAWNS[p.id].x,y:SPAWNS[p.id].y,vx:0,vy:0,hp:100,dmg:0,stocks:3,alive:true,iF:180,respT:0,
       weapon:null,ammo:0,bullets:[],burning:0,deathProcessed:false,tumble:0,tumbleV:0,landSquash:0});
   });
   wpns=[];wTimers=Array(map.wspawns.length).fill(0);
