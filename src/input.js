@@ -10,12 +10,11 @@ window.addEventListener('keyup',e=>keys[e.key]=false);
 const kH=k=>!!keys[k];
 
 // ── MOUSE TRACKING FOR P1 AIMING ────────────────────────────────────────────
-let mouseX=600,mouseY=300;
+let mouseX=W/2,mouseY=H/2;
 window.addEventListener('mousemove',e=>{
   const rect=canvas.getBoundingClientRect();
-  const dpr=window.devicePixelRatio||1;
-  mouseX=(e.clientX-rect.left)*dpr;
-  mouseY=(e.clientY-rect.top)*dpr;
+  mouseX=(e.clientX-rect.left)*(canvas.width/rect.width);
+  mouseY=(e.clientY-rect.top)*(canvas.height/rect.height);
 });
 
 // Keyboard bindings per player index (null = gamepad)
