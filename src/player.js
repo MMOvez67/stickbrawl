@@ -83,7 +83,7 @@ class Player{
         thrownWpns.push(new ThrownWpn(this.x+this.facing*20,this.y-30,this.facing*10,-4,this.id,this.weapon));
         this.weapon=null;this.ammo=0;
       }else{
-        for(const w of wpns){if(!w.active)continue;if(boxOlp(this.box(),w.box())){this.weapon=w.type;this.ammo=WPN[w.type].ammo;w.active=false;sound('pickup');break;}}
+        for(const w of wpns){if(!w||!w.active)continue;if(boxOlp(this.box(),w.box())){this.weapon=w.type;this.ammo=WPN[w.type].ammo;w.active=false;sound('pickup');break;}}
         for(const tw of thrownWpns){if(!tw.active)continue;if(boxOlp(this.box(),tw.box())){this.weapon=tw.type;this.ammo=Math.ceil(WPN[tw.type].ammo*.6);tw.active=false;sound('pickup');break;}}
       }
     }
