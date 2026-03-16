@@ -99,12 +99,13 @@ Nach JEDEM commit der einen Bug fixt oder ein Feature hinzufügt:
 1. TODO-Liste in CLAUDE.md aktualisieren (erledigte abhaken ✅, neue hinzufügen)
 2. Aktuellen Versionsstand oben in CLAUDE.md eintragen
 
-### Aktueller Stand (v5.6)
+### Aktueller Stand (v5.6+)
 - Delta Time ✅ (v5.5)
 - Respawn & Win Screen ✅ (v5.6)
 - Kill Cam Slowmo ✅ (v5.6)
 - Schwarzer Screen nach Spielstart ✅ (v5.6)
 - Canvas nicht responsive ✅ (v5.6)
+- Weapon Crash bei Pickup ✅ (v5.6+)
 - Mouse Aiming 🟠 (offen)
 - HP System 100→0 🟠 (offen)
 
