@@ -36,19 +36,19 @@ class Player{
     return{x:this.x+ox,y:this.y-54,w:rng,h:26};
   }
 
-  tick(wpns,thrownWpns,explosions){
+  tick(dt=1,wpns,thrownWpns,explosions){
     if(!this.active)return;
     if(!this.alive){return;}
     this.anim++;
-    if(this.atkT>0)this.atkT--;if(this.atkCD>0)this.atkCD--;
-    if(this.iF>0)this.iF--;if(this.hitT>0)this.hitT--;if(this.wallT>0)this.wallT--;
-    if(this.burning>0){this.burning--;if(this.burning%6===0){this.dmg+=1;addFire(this.x+(Math.random()*16-8),this.y-(Math.random()*30+20),2);}}
-    this.tumble+=this.tumbleV;this.tumbleV*=this.onGround?.72:.93;
+    if(this.atkT>0)this.atkT-=dt;if(this.atkCD>0)this.atkCD-=dt;
+    if(this.iF>0)this.iF-=dt;if(this.hitT>0)this.hitT-=dt;if(this.wallT>0)this.wallT-=dt;
+    if(this.burning>0){const prevBurn=this.burning;this.burning-=dt;if(Math.floor(prevBurn/6)!==Math.floor(this.burning/6)){this.dmg+=1;addFire(this.x+(Math.random()*16-8),this.y-(Math.random()*30+20),2);}}
+    this.tumble+=this.tumbleV;this.tumbleV*=Math.pow(this.onGround?.72:.93,dt);
     if(Math.abs(this.tumbleV)<.005&&this.onGround)this.tumble+=(0-this.tumble)*.15;
     if(this.landSquash>0)this.landSquash=Math.max(0,this.landSquash-.09);
 
     const wpnW=this.weapon&&WPN[this.weapon]?WPN[this.weapon].weight:0;
-    const curAccel=BASE_ACCEL*(1-wpnW*WEIGHT_SLOWDOWN);
+    const curAccel=BASE_ACCEL*(1-wpnW*WEIGHT_SLOWDOWN)*dt;
     const curMaxVx=BASE_MAX_VX*(1-wpnW*WEIGHT_SLOWDOWN);
 
     const c=this.getInput();
@@ -90,17 +90,17 @@ class Player{
     this.pP=c.P;
 
     const s=typeof slowmo!=='undefined'?slowmo:1;
-    this.vy=Math.min(this.vy+GRAV*s,TERM_V);
-    this.vx*=this.onGround?FRIC:FRIC_AIR;
+    this.vy=Math.min(this.vy+GRAV*dt*s,TERM_V);
+    this.vx*=Math.pow(this.onGround?FRIC:FRIC_AIR,dt);
     if(Math.abs(this.vx)<.07)this.vx=0;
-    this.x+=this.vx*s;
+    this.x+=this.vx*dt*s;
     this.prevVy=this.vy;
 
     const wasGround=this.onGround;
     this.onGround=false;this.wallDir=0;
-    const steps=Math.ceil(Math.abs(this.vy)/7),stepVy=this.vy/steps;
+    const steps=Math.ceil(Math.abs(this.vy*dt*s)/7),stepVy=this.vy*dt*s/steps;
     for(let si=0;si<steps;si++){
-      const prevY=this.y;this.y+=stepVy*s;let hit=false;
+      const prevY=this.y;this.y+=stepVy;let hit=false;
       for(const p of map.plats){
         if(this.x+PW<=p.x||this.x-PW>=p.x+p.w)continue;
         if(stepVy>=0&&prevY<=p.y+2&&this.y>=p.y){
@@ -118,7 +118,7 @@ class Player{
         if(this.x+PW>=p.x&&this.x+PW<=p.x+10&&this.vx>0){this.wallDir=1;this.wallT=10;this.vx=Math.min(this.vx,.5);break;}
       }
     }
-    if(this.onGround){this.jumpsLeft=2;this.coyoteT=7;}else if(this.coyoteT>0)this.coyoteT--;
+    if(this.onGround){this.jumpsLeft=2;this.coyoteT=7;}else if(this.coyoteT>0)this.coyoteT-=dt;
 
     for(const b of this.bullets){
       if(!b.active||b.type!=='rocket')continue;
@@ -127,22 +127,29 @@ class Player{
     for(const sb of map.sawblades){
       if(dist(this.x,this.y-PH*.5,sb.x,sb.y)<sb.r+8){const dx=this.x-sb.x,dy=(this.y-PH*.5)-sb.y,n=Math.max(dist(this.x,this.y-PH*.5,sb.x,sb.y),.1);this.takeDmg(3,(dx/n)*5,(dy/n)*5);}
     }
-    for(const b of this.bullets)b.tick();
+    for(const b of this.bullets)b.tick(dt);
     this.bullets=this.bullets.filter(b=>b.active);
     if(this.y>H+260||this.x<-440||this.x>W+440||this.y<-600)this._die();
   }
 
   _doAttack(){
     const bx=this.x+this.facing*22,by=this.y-36;
+    const useMouse=this.id===0&&typeof mouseX!=='undefined'&&typeof mouseY!=='undefined';
+    let aimVx=this.facing*15,aimVy=0;
+    if(useMouse){
+      const dx=mouseX-bx,dy=mouseY-by;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d>0){aimVx=dx/d*15;aimVy=dy/d*15;}
+    }
     if(!this.weapon){this.atkT=24;this.atkCD=26;sound('hit');}
-    else if(this.weapon==='PISTOL'){this.bullets.push(new Bullet(bx,by,this.facing*15,0,this.id,'normal'));addMuzzle(bx,by,this.facing);addShell(this.x+this.facing*8,by,this.facing);this._useAmmo(10,10);sound('shoot');}
-    else if(this.weapon==='SHOTGUN'){for(let i=-2;i<=2;i++)this.bullets.push(new Bullet(bx,by,this.facing*12,i*2.8,this.id,'pellet'));addMuzzle(bx,by,this.facing);this.vx-=this.facing*5.5;this.vy-=1.5;this._useAmmo(24,24);sound('shotgun');addShake(4,6);}
-    else if(this.weapon==='ROCKET'){this.bullets.push(new Bullet(this.x+this.facing*26,by,this.facing*7,-.5,this.id,'rocket'));addMuzzle(this.x+this.facing*26,by,this.facing);this.vx-=this.facing*2.5;this._useAmmo(50,50);addShake(2,4);}
-    else if(this.weapon==='BOUNCER'){this.bullets.push(new Bullet(bx,by,this.facing*13,Math.random()*2-1,this.id,'bouncer'));addMuzzle(bx,by,this.facing);addShell(this.x+this.facing*8,by,this.facing);this._useAmmo(14,14);sound('shoot');}
-    else if(this.weapon==='SNIPER'){this.bullets.push(new Bullet(bx,by,this.facing*32,0,this.id,'sniper'));addMuzzle(bx,by,this.facing);this.vx-=this.facing*3.5;this._useAmmo(30,30);sound('sniper');addShake(5,8);}
-    else if(this.weapon==='GRENADE'){grenades.push(new Grenade(this.x+this.facing*18,by,this.facing*8+this.vx*.3,-9,this.id));this._useAmmo(20,28);sound('shoot');}
+    else if(this.weapon==='PISTOL'){this.bullets.push(new Bullet(bx,by,aimVx,aimVy,this.id,'normal'));addMuzzle(bx,by,this.facing);addShell(this.x+this.facing*8,by,this.facing);this._useAmmo(10,10);sound('shoot');}
+    else if(this.weapon==='SHOTGUN'){for(let i=-2;i<=2;i++)this.bullets.push(new Bullet(bx,by,aimVx*0.8,aimVy*0.8+i*2.8,this.id,'pellet'));addMuzzle(bx,by,this.facing);this.vx-=this.facing*5.5;this.vy-=1.5;this._useAmmo(24,24);sound('shotgun');addShake(4,6);}
+    else if(this.weapon==='ROCKET'){this.bullets.push(new Bullet(this.x+this.facing*26,by,aimVx*0.47,aimVy*0.47-0.5,this.id,'rocket'));addMuzzle(this.x+this.facing*26,by,this.facing);this.vx-=this.facing*2.5;this._useAmmo(50,50);addShake(2,4);}
+    else if(this.weapon==='BOUNCER'){this.bullets.push(new Bullet(bx,by,aimVx*0.87,aimVy*0.87+Math.random()*2-1,this.id,'bouncer'));addMuzzle(bx,by,this.facing);addShell(this.x+this.facing*8,by,this.facing);this._useAmmo(14,14);sound('shoot');}
+    else if(this.weapon==='SNIPER'){this.bullets.push(new Bullet(bx,by,aimVx*2.13,aimVy*2.13,this.id,'sniper'));addMuzzle(bx,by,this.facing);this.vx-=this.facing*3.5;this._useAmmo(30,30);sound('sniper');addShake(5,8);}
+    else if(this.weapon==='GRENADE'){grenades.push(new Grenade(this.x+this.facing*18,by,this.facing*8+this.vx*.3,aimVy*0.6-9,this.id));this._useAmmo(20,28);sound('shoot');}
     else if(this.weapon==='BLINK_DAGGER'){blinkStrikes.push(new BlinkStrike(this.x,by,this.facing,this.id));this.x+=this.facing*200;addDustCloud(this.x,by,this.col,true);addPts(this.x,by,'#ff44ff',8,5,3,.12);this._useAmmo(18,40);sound('sniper');}
-    else if(this.weapon==='THRUSTER'){stickyBombs.push(new StickyBomb(this.x+this.facing*18,by,this.facing*10,-2,this.id));this._useAmmo(16,22);sound('shoot');}
+    else if(this.weapon==='THRUSTER'){stickyBombs.push(new StickyBomb(this.x+this.facing*18,by,this.facing*10,aimVy*0.2-2,this.id));this._useAmmo(16,22);sound('shoot');}
     else if(this.weapon==='FLAME_FISTS'){this.atkT=28;this.atkCD=22;}
     else if(this.weapon==='SWORD'){this.atkT=32;this.atkCD=34;}
   }

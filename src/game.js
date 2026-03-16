@@ -71,13 +71,12 @@ window.startGame=n=>{
 const checkWin=()=>{
   if(roundState!=='fight')return;
   const act=players.filter(p=>p.active);
-  if(act.every(p=>p.stocks===3)&&roundNum>0)return;if(roundNum===0)return;
-  const hl=act.filter(p=>p.stocks>0);
-  if(hl.length<=1){
-    roundWinner=hl[0]||null;
+  const alive=act.filter(p=>p.alive);
+  if(alive.length<=1){
+    roundWinner=alive[0]||null;
     if(roundWinner){
       roundWins[roundWinner.id]++;
-      addKill(roundWinner.col,roundWinner.name,'#e63946',act.filter(p=>p.id!==roundWinner.id).map(p=>p.name).join('&'));
+      addKill(roundWinner.col,roundWinner.name,'#e63946',act.filter(p=>p.id!==roundWinner.id&&!p.alive).map(p=>p.name).join('&'));
     }
     if(roundWinner&&roundWins[roundWinner.id]>=FT){
       finalWinner=roundWinner;
@@ -89,15 +88,15 @@ const checkWin=()=>{
 };
 
 // ── KILL CAM TRIGGER ───────────────────────────────────────────────────────
-const checkKillCamTrigger=()=>{
+const checkKillCamTrigger=(dt=1)=>{
   if(roundState!=='fight')return;
   const act=players.filter(p=>p.active&&p.alive);
   if(act.length!==1)return;
   const lastDanger=act[0];
-  if(lastDanger.stocks!==1)return;
-  const willDie=(lastDanger.x+lastDanger.vx*45>W+60)||(lastDanger.x+lastDanger.vx*45<-60)||(lastDanger.y+lastDanger.vy*45>H+60);
+  const pred=45*dt;
+  const willDie=(lastDanger.x+lastDanger.vx*pred>W+60)||(lastDanger.x+lastDanger.vx*pred<-60)||(lastDanger.y+lastDanger.vy*pred>H+60);
   if(willDie&&slowmo===1.0){slowmo=0.15;killCamTarget={x:lastDanger.x,y:lastDanger.y};finishHimT=1;}
-  else if(!willDie||lastDanger.stocks===0)slowmo=Math.max(slowmo-(1-slowmo)*0.08,1);
+  else if(!willDie)slowmo=Math.max(slowmo-(1-slowmo)*0.08,1);
   else if(slowmo<1)slowmo=slowmo+(1-slowmo)*0.08;
 };
 
@@ -116,8 +115,8 @@ const drawHUD=()=>{
 };
 
 // ── ROUND OVERLAY ──────────────────────────────────────────────────────────
-const drawRoundOverlay=()=>{
-  roundStateT++;
+const drawRoundOverlay=(dt=1)=>{
+  roundStateT+=dt;
   if(roundState==='intro'){
     if(roundStateT>90){roundState='fight';return;}
     const a=roundStateT<15?roundStateT/15:roundStateT>75?(90-roundStateT)/15:1;
@@ -143,8 +142,8 @@ const drawRoundOverlay=()=>{
 };
 
 // ── GAME OVER ──────────────────────────────────────────────────────────────
-const drawGO=()=>{
-  goT++;ctx.save();ctx.globalAlpha=Math.min(goT/38,.95);ctx.fillStyle='#04090f';ctx.fillRect(0,0,W,H);ctx.restore();
+const drawGO=(dt=1)=>{
+  goT+=dt;ctx.save();ctx.globalAlpha=Math.min(goT/38,.95);ctx.fillStyle='#04090f';ctx.fillRect(0,0,W,H);ctx.restore();
   if(goT<28)return;const ta=Math.min((goT-28)/20,1);ctx.save();ctx.globalAlpha=ta;ctx.textAlign='center';
   if(finalWinner){
     ctx.shadowColor=finalWinner.col;ctx.shadowBlur=40;ctx.fillStyle=finalWinner.col;ctx.font='bold 90px Courier New';ctx.fillText(finalWinner.name,W/2,H/2-40);
@@ -162,27 +161,35 @@ window.addEventListener('keydown',e=>{
   else if(e.key==='Escape'){gameState='title';document.getElementById('ts').style.display='flex';}
 });
 
+// ── FRAMERATE INDEPENDENCE ────────────────────────────────────────────────
+const TARGET_FPS=60;
+const TARGET_DT=1000/TARGET_FPS;
+let lastTime=0;
+
 // ── MAIN LOOP ──────────────────────────────────────────────────────────────
-const loop=()=>{
-  requestAnimationFrame(loop);frame++;
+const loop=(timestamp)=>{
+  requestAnimationFrame(loop);
+  const rawDt=timestamp-lastTime;lastTime=timestamp;
+  const dt=Math.min(rawDt,50)/TARGET_DT;
+  frame++;
 
   if(gameState==='title'){
     const sky=ctx.createLinearGradient(0,0,0,H);sky.addColorStop(0,'#07111e');sky.addColorStop(1,'#0b1525');ctx.fillStyle=sky;ctx.fillRect(0,0,W,H);return;
   }
 
   // Weapon timers
-  for(let i=0;i<map.wspawns.length;i++){if(wpns[i]){if(!wpns[i].active){wTimers[i]++;if(wTimers[i]>340)spawnWpn(i);}else wpns[i].tick();}}
-  for(const ex of explosions)ex.tick();
-  for(const tw of thrownWpns)tw.tick();
-  for(const g of grenades)g.tick(explosions);
-  for(const bs of blinkStrikes)bs.tick();
-  for(const sb of stickyBombs)sb.tick(players,explosions);
+  for(let i=0;i<map.wspawns.length;i++){if(wpns[i]){if(!wpns[i].active){wTimers[i]+=dt;if(wTimers[i]>340)spawnWpn(i);}else wpns[i].tick(dt);}}
+  for(const ex of explosions)ex.tick(dt);
+  for(const tw of thrownWpns)tw.tick(dt);
+  for(const g of grenades)g.tick(dt,explosions);
+  for(const bs of blinkStrikes)bs.tick(dt);
+  for(const sb of stickyBombs)sb.tick(dt,players,explosions);
   [grenades,blinkStrikes,stickyBombs].forEach(arr=>{for(let i=arr.length-1;i>=0;i--)if(!arr[i].active)arr.splice(i,1);});
 
   if(gameState==='playing'&&roundState==='fight'){
-    for(const p of players)p.tick(wpns,thrownWpns,explosions);
-    doCombat();checkWin();checkKillCamTrigger();
-    tickAllParticles();
+    for(const p of players)p.tick(dt,wpns,thrownWpns,explosions);
+    doCombat();checkWin();checkKillCamTrigger(dt);
+    tickAllParticles(dt);
   }
 
   const sh=getShake();
@@ -212,12 +219,12 @@ const loop=()=>{
     ctx.fillStyle=p.col;ctx.globalAlpha=.35;ctx.beginPath();ctx.arc(sp.x,sp.y-40,4,0,Math.PI*2);ctx.fill();ctx.restore();
   }
   drawKFeed();
-  if(finishHimT>0&&finishHimT<120){finishHimT++;const a=finishHimT<20?finishHimT/20:finishHimT>100?(120-finishHimT)/20:1;const s=1+Math.sin(finishHimT*0.15)*0.04;ctx.save();ctx.globalAlpha=a*0.92;ctx.textAlign='center';ctx.translate(W/2,H/2-60);ctx.scale(s,s);ctx.font='bold 68px Courier New';ctx.fillStyle='#ff2200';ctx.shadowColor='#ff0000';ctx.shadowBlur=30;ctx.fillText('FINISH HIM',0,0);ctx.restore();}
+  if(finishHimT>0&&finishHimT<120){finishHimT+=dt;const a=finishHimT<20?finishHimT/20:finishHimT>100?(120-finishHimT)/20:1;const s=1+Math.sin(finishHimT*0.15)*0.04;ctx.save();ctx.globalAlpha=a*0.92;ctx.textAlign='center';ctx.translate(W/2,H/2-60);ctx.scale(s,s);ctx.font='bold 68px Courier New';ctx.fillStyle='#ff2200';ctx.shadowColor='#ff0000';ctx.shadowBlur=30;ctx.fillText('FINISH HIM',0,0);ctx.restore();}
   ctx.save();ctx.globalAlpha=.18;ctx.font='bold 11px Courier New';ctx.fillStyle='#5090c0';ctx.fillText(map.name,10,16);ctx.restore();
   ctx.restore();
 
-  if(roundState!=='fight')drawRoundOverlay();
-  if(gameState==='gameover')drawGO();
+  if(roundState!=='fight')drawRoundOverlay(dt);
+  if(gameState==='gameover')drawGO(dt);
   if(frame%3===0)drawHUD();
 };
 
