@@ -93,7 +93,22 @@ Dann in `drawMap()` einen neuen `else if(map.style==='custom')` Case hinzufügen
 - `FRIC` — Boden-Reibung (.80), `FRIC_AIR` — Luft-Reibung (.96)
 
 ## Bekannte Bugs / TODO
-Reihenfolge nach Priorität:
+
+### Auto-Update Regel
+Nach JEDEM commit der einen Bug fixt oder ein Feature hinzufügt:
+1. TODO-Liste in CLAUDE.md aktualisieren (erledigte abhaken ✅, neue hinzufügen)
+2. Aktuellen Versionsstand oben in CLAUDE.md eintragen
+
+### Aktueller Stand (v5.6)
+- Delta Time ✅ (v5.5)
+- Respawn & Win Screen ✅ (v5.6)
+- Kill Cam Slowmo ✅ (v5.6)
+- Schwarzer Screen nach Spielstart ✅ (v5.6)
+- Canvas nicht responsive ✅ (v5.6)
+- Mouse Aiming 🟠 (offen)
+- HP System 100→0 🟠 (offen)
+
+### Roadmap (Priorität)
 1. [ ] Online Multiplayer — WebSockets via Partykit
 2. [ ] Moving Platforms — für neue Maps
 3. [ ] Lava Rising — als Map Hazard
