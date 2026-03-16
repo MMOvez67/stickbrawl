@@ -107,8 +107,9 @@ Nach JEDEM commit der einen Bug fixt oder ein Feature hinzufügt:
 - Canvas nicht responsive ✅ (v5.6)
 - Weapon Crash bei Pickup ✅ (v5.6+)
 - Code Quality Gate (Autonomous) ✅ (v5.6+) — 0 Bugs found
-- Mouse Aiming 🟠 (offen)
+- Mouse Aiming ✅ (v5.6++)
 - HP System 100→0 🟠 (offen)
+- First Shot Bug (nur erste Schuss möglich) 🔴 (neu)
 
 ### Roadmap (Priorität)
 1. [ ] Online Multiplayer — WebSockets via Partykit
