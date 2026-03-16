@@ -5,15 +5,15 @@
 <title>StickBrawl</title>
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
-body{background:#060810;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:'Courier New',monospace;overflow:hidden;user-select:none;}
-#wrap{position:relative;}canvas{display:block;}
+body{background:#060810;display:flex;flex-direction:column;align-items:center;justify-content:center;height:100vh;font-family:'Courier New',monospace;overflow:hidden;user-select:none;padding:0;}
+#wrap{position:relative;width:100%;max-width:1200px;}canvas{width:100%;height:auto;display:block;}
 #hud{background:#08111e;border-top:1px solid #1a2a3a;padding:7px 24px;display:flex;align-items:center;justify-content:space-around;}
 .ph{display:flex;align-items:center;gap:9px;}.pdot{width:11px;height:11px;border-radius:50%;flex-shrink:0;}
 .pname{font-size:8px;color:#2e4258;text-transform:uppercase;letter-spacing:1.5px;}
 .pdmg{font-size:22px;font-weight:900;line-height:1;}.pstk{font-size:12px;letter-spacing:2px;}
 .pwpn{font-size:9px;letter-spacing:1px;margin-top:1px;}
 /* Title screen */
-#ts{position:absolute;inset:0 0 auto 0;height:600px;background:#060810;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:10;}
+#ts{position:absolute;inset:0 0 auto 0;width:100%;max-width:1200px;height:600px;background:#060810;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:10px;z-index:10;}
 #ts .tag{font-size:9px;letter-spacing:5px;color:#1a2a3a;text-transform:uppercase;}
 #ts h1{font-size:88px;font-weight:900;letter-spacing:-6px;line-height:1;color:#c8dff5;}
 .cgrid{display:grid;grid-template-columns:1fr 1fr;gap:5px;width:580px;margin-top:6px;}

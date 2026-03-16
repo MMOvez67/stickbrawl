@@ -87,7 +87,7 @@ class StickyBomb{
 // ── THROWN WEAPON ──────────────────────────────────────────────────────────
 class ThrownWpn{
   constructor(x,y,vx,vy,owner,type){Object.assign(this,{x,y,vx,vy,owner,type,active:true,angle:0,spin:vx*.06});}
-  tick(dt=1){const s=typeof slowmo!=='undefined'?slowmo:1;this.vy+=GRAV*.8*dt*s;this.x+=this.vx*dt*s;this.y+=this.vy*dt*s;this.angle+=this.spin;this.vx*=Math.pow(.97,dt);if(this.y>H+100)this.active=false;for(const p of map.plats){if(pInBox(this.x,this.y,p)){this.vy*=-.5;this.vx*=.5;this.spin*=.5;break;}}}}
+  tick(dt=1){const s=typeof slowmo!=='undefined'?slowmo:1;this.vy+=GRAV*.8*dt*s;this.x+=this.vx*dt*s;this.y+=this.vy*dt*s;this.angle+=this.spin;this.vx*=Math.pow(.97,dt);if(this.y>H+100)this.active=false;for(const p of map.plats){if(pInBox(this.x,this.y,p)){this.vy*=-.5;this.vx*=.5;this.spin*=.5;break;}}}
   draw(){if(!this.active)return;const def=WPN[this.type];ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.angle);ctx.fillStyle=def.col;ctx.shadowColor=def.col;ctx.shadowBlur=10;ctx.fillRect(-10,-3,18,5);ctx.restore();}
   box(){return{x:this.x-14,y:this.y-10,w:28,h:20};}
 }
