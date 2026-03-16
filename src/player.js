@@ -9,7 +9,7 @@ class Player{
     this.atkT=0;this.atkCD=0;this.hitT=0;this.shielding=false;
     this.burning=0;this.coyoteT=0;this.wallDir=0;this.wallT=0;
     this.anim=Math.random()*100;this.facing=id<2?1:-1;
-    this.pJ=false;this.pA=false;this.pP=false;
+    this.pJ=false;this.pA=false;this.pP=false;this.chargeT=0;
     this.minigunHeld=0;this.deathProcessed=false;
     this.tumble=0;this.tumbleV=0;this.landSquash=0;this.prevVy=0;
   }
@@ -79,13 +79,18 @@ class Player{
     this.pA=c.A;
 
     if(c.P&&!this.pP){
-      if(this.weapon){
-        thrownWpns.push(new ThrownWpn(this.x+this.facing*20,this.y-30,this.facing*10,-4,this.id,this.weapon));
-        this.weapon=null;this.ammo=0;
-      }else{
+      if(!this.weapon){
         for(const w of wpns){if(!w||!w.active)continue;if(boxOlp(this.box(),w.box())){this.weapon=w.type;this.ammo=WPN[w.type].ammo;w.active=false;sound('pickup');break;}}
         for(const tw of thrownWpns){if(!tw.active)continue;if(boxOlp(this.box(),tw.box())){this.weapon=tw.type;this.ammo=Math.ceil(WPN[tw.type].ammo*.6);tw.active=false;sound('pickup');break;}}
+      }else{
+        this.chargeT=0;
       }
+    }
+    if(c.P&&this.weapon)this.chargeT+=dt;
+    if(!c.P&&this.pP&&this.weapon){
+      const chargeMult=1+Math.min(this.chargeT/120,1);
+      thrownWpns.push(new ThrownWpn(this.x+this.facing*20,this.y-30,this.facing*10*chargeMult,-4,this.id,this.weapon));
+      this.weapon=null;this.ammo=0;this.chargeT=0;
     }
     this.pP=c.P;
 
