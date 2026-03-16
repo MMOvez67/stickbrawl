@@ -78,14 +78,6 @@ class Player{
     }else this.minigunHeld=0;
     this.pA=c.A;
 
-    if(c.P&&!this.pP){
-      if(!this.weapon){
-        for(const w of wpns){if(!w||!w.active)continue;if(boxOlp(this.box(),w.box())){this.weapon=w.type;this.ammo=WPN[w.type].ammo;w.active=false;sound('pickup');break;}}
-        for(const tw of thrownWpns){if(!tw.active)continue;if(boxOlp(this.box(),tw.box())){this.weapon=tw.type;this.ammo=Math.ceil(WPN[tw.type].ammo*.6);tw.active=false;sound('pickup');break;}}
-      }else{
-        this.chargeT=0;
-      }
-    }
     if(c.P&&this.weapon)this.chargeT+=dt;
     if(!c.P&&this.pP&&this.weapon){
       const chargeMult=1+Math.min(this.chargeT/120,1);
@@ -93,6 +85,11 @@ class Player{
       this.weapon=null;this.ammo=0;this.chargeT=0;
     }
     this.pP=c.P;
+
+    if(!this.weapon){
+      for(const w of wpns){if(!w||!w.active)continue;if(boxOlp(this.box(),w.box())){this.weapon=w.type;this.ammo=WPN[w.type].ammo;w.active=false;sound('pickup');break;}}
+      for(const tw of thrownWpns){if(!tw.active)continue;if(boxOlp(this.box(),tw.box())){this.weapon=tw.type;this.ammo=Math.ceil(WPN[tw.type].ammo*.6);tw.active=false;sound('pickup');break;}}
+    }
 
     const s=typeof slowmo!=='undefined'?slowmo:1;
     this.vy=Math.min(this.vy+GRAV*dt*s,TERM_V);
