@@ -109,6 +109,8 @@ Nach JEDEM commit der einen Bug fixt oder ein Feature hinzufügt:
 - Code Quality Gate (Autonomous) ✅ (v5.6+) — 0 Bugs found
 - Mouse Aiming ✅ (v5.6++)
 - First Shot Bug (atkCD float comparison) ✅ (v5.6++)
+- Canvas Ghost Trail (missing clear) ✅ (v5.6++)
+- Canvas Fullscreen Responsive ✅ (v5.6++)
 - HP System 100→0 🟠 (offen)
 
 ### Roadmap (Priorität)
