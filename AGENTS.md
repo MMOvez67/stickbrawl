@@ -13,10 +13,19 @@ Committed nach jeder Änderung.
 Reported Ergebnis an Orchestrator.
 
 ## TESTER
-Öffnet index.html lokal, simuliert Gameplay via Code-Review.
-Prüft: spawn, movement, weapons, win screen, kill cam.
+### Static Code Analysis:
 Searched nach JS-Errors und duplicate const declarations.
+Prüft: dt-Parameter, undefined-Checks, shadowBlur-Resets.
 Reported gefundene Bugs mit Datei + Zeilennummer.
+
+### Runtime Validation (Headless):
+```bash
+open -a "Google Chrome" --args --headless --disable-gpu \
+  --dump-dom ~/stickbrawl/index.html 2>&1 | grep -i "error\|undefined\|null\|exception"
+```
+Fängt: ReferenceError, TypeError, undefined-Zugriffe, null-pointer-Fehler.
+Lädt all Scripts und führt initCode aus (nicht nur Syntax-Check).
+Output: Zeile-für-Zeile Fehler aus Console + DOM-Dump.
 
 ## CRITIC
 Reviewed jeden Commit auf: duplicate declarations, fehlende dt-Multiplikation,
