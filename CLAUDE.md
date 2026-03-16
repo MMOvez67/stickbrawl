@@ -106,6 +106,7 @@ Nach JEDEM commit der einen Bug fixt oder ein Feature hinzufügt:
 - Schwarzer Screen nach Spielstart ✅ (v5.6)
 - Canvas nicht responsive ✅ (v5.6)
 - Weapon Crash bei Pickup ✅ (v5.6+)
+- Code Quality Gate (Autonomous) ✅ (v5.6+) — 0 Bugs found
 - Mouse Aiming 🟠 (offen)
 - HP System 100→0 🟠 (offen)
 
