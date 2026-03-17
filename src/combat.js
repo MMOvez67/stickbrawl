@@ -35,7 +35,7 @@ const doCombat=()=>{
       for(const def of alive){
         if(def.id===atk.id)continue;
         // Directional shield
-        if(def.shielding&&def.weapon==='SHIELD'&&Math.sign(bul.vx)!==def.facing){
+        if(def.shielding&&def.weapon==='SHIELD'&&Math.sign(bul.vx)===def.facing){
           bul.vx*=-1;bul.x+=bul.vx*10;bul.reflected=true;bul.reflectImmunity=def.id;
           def.ammo--;if(def.ammo<=0)def.weapon=null;
           addPts(bul.x,bul.y,'#44aaff',6,4,2,.08);continue;

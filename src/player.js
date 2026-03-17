@@ -38,7 +38,10 @@ class Player{
 
   tick(dt=1,wpns,thrownWpns,explosions){
     if(!this.active)return;
-    if(!this.alive){return;}
+    if(!this.alive){
+      if(this.stocks>0){this.respT+=dt;if(this.respT>=145){this.respT=0;this._spawn();}}
+      return;
+    }
     this.anim++;
     if(this.atkT>0)this.atkT-=dt;if(this.atkCD>0)this.atkCD-=dt;
     if(this.iF>0)this.iF-=dt;if(this.hitT>0)this.hitT-=dt;if(this.wallT>0)this.wallT-=dt;
@@ -204,7 +207,7 @@ class Player{
     ctx.translate(cx,fy-PH*.5);ctx.rotate(this.tumble);ctx.translate(-cx,-(fy-PH*.5));
     ctx.translate(cx,fy);ctx.scale(sx,sq);ctx.translate(-cx,-fy);
     ctx.strokeStyle=c;ctx.lineWidth=3;ctx.lineCap='round';ctx.lineJoin='round';
-    if(flash||this.burning>0){ctx.shadowColor=this.burning>0?'#ff5500':this.col;ctx.shadowBlur=18;}
+    if(flash||this.burning>0){ctx.shadowColor=this.burning>0?'#ff5500':this.col;ctx.shadowBlur=18;}else{ctx.shadowBlur=0;}
 
     const hipY=fy-22,shlY=fy-46,headY=fy-61,HR=9;
     const mov=Math.abs(this.vx)>.6;
