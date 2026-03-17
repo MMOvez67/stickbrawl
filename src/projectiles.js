@@ -57,7 +57,7 @@ class Bullet{
 // ── GRENADE ────────────────────────────────────────────────────────────────
 class Grenade{
   constructor(x,y,vx,vy,owner){Object.assign(this,{x,y,vx,vy,owner,active:true,fuse:200,bounces:0,angle:0});}
-  tick(dt=1,explosions){const s=typeof slowmo!=='undefined'?slowmo:1;this.vy+=GRAV*.7*dt*s;this.vx*=Math.pow(.992,dt);this.x+=this.vx*dt*s;this.y+=this.vy*dt*s;this.angle+=this.vx*.08;this.fuse-=dt;if(this.fuse<=0){this._explode(explosions);return;}for(const p of map.plats){if(!pInBox(this.x,this.y,p))continue;if(this.vy>0){this.y=p.y-1;this.vy*=-.55;this.vx*=.7;}else{this.y=p.y+p.h+1;this.vy*=-.4;}this.bounces++;if(this.bounces>4)this._explode(explosions);break;}if(this.y>H+60)this.active=false;}
+  tick(dt=1,explosions){const s=typeof slowmo!=='undefined'?slowmo:1;this.vy+=GRAV*.7*dt*s;this.vx*=Math.pow(.992,dt);this.x+=this.vx*dt*s;this.y+=this.vy*dt*s;this.angle+=this.vx*.08;this.fuse-=dt*s;if(this.fuse<=0){this._explode(explosions);return;}for(const p of map.plats){if(!pInBox(this.x,this.y,p))continue;if(this.vy>0){this.y=p.y-1;this.vy*=-.55;this.vx*=.7;}else{this.y=p.y+p.h+1;this.vy*=-.4;}this.bounces++;if(this.bounces>4)this._explode(explosions);break;}if(this.y>H+60)this.active=false;}
   _explode(exp){if(!this.active)return;exp.push(new Explosion(this.x,this.y,85));addPts(this.x,this.y,'#ff8800',18,8,5,.14);addShake(2,8);sound('rocket');this.active=false;}
   draw(){if(!this.active)return;const blink=this.fuse<60&&Math.floor(this.fuse/6)%2===0;ctx.save();ctx.translate(this.x,this.y);ctx.rotate(this.angle);ctx.fillStyle=blink?'#ff4400':'#44aa44';ctx.shadowColor=ctx.fillStyle;ctx.shadowBlur=blink?14:6;ctx.beginPath();ctx.arc(0,0,5,0,Math.PI*2);ctx.fill();ctx.fillStyle='#888';ctx.fillRect(-2,-8,4,6);ctx.restore();}
 }
