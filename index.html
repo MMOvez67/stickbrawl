@@ -68,6 +68,11 @@ canvas {
 .ctrl-table td{padding:5px 14px;font-size:10px;color:#3a556a;border-bottom:1px solid #111e2e;}
 .ctrl-table td:first-child{color:#c8dff5;width:100px;}
 .ctrl-table tr:hover td{background:#0b1623;}
+#mctrl{display:none;position:absolute;bottom:0;left:0;right:0;height:160px;pointer-events:none;z-index:5;}
+.mc-btn{width:68px;height:68px;background:rgba(200,223,245,0.08);border:2px solid rgba(200,223,245,0.18);border-radius:14px;color:#c8dff5;font-size:26px;cursor:pointer;pointer-events:auto;user-select:none;-webkit-user-select:none;touch-action:none;display:flex;align-items:center;justify-content:center;}
+.mc-btn:active{background:rgba(255,107,0,0.35);border-color:#FF6B00;}
+#mc-atk{background:rgba(255,107,0,0.15);border-color:rgba(255,107,0,0.5);font-size:14px;letter-spacing:1px;font-family:'Courier New',monospace;font-weight:bold;}
+#mc-pk{font-size:12px;letter-spacing:1px;font-family:'Courier New',monospace;}
 </style>
 </head>
 <body>
@@ -106,6 +111,7 @@ canvas {
         <button class="pbtn" onclick="hostGame(2)">HOST 2P</button>
         <span id="room-code-display" style="display:none;color:#FF6B00;font-size:20px;letter-spacing:4px;font-weight:900;padding:0 12px;"></span>
       </div>
+      <div id="net-status" style="display:none;font-size:11px;color:#7aa0c0;letter-spacing:2px;font-family:'Courier New',monospace;margin-top:-4px;"></div>
       <div class="mbtns" style="margin-top:4px;">
         <input id="join-code-input" placeholder="CODE" maxlength="4"
           style="background:#0f1c2e;color:#c8dff5;border:1px solid #1a3050;padding:10px 14px;font-size:18px;font-family:'Courier New',monospace;letter-spacing:4px;width:110px;text-align:center;text-transform:uppercase;">
@@ -131,6 +137,20 @@ canvas {
         <tr><td>BLINK DGR</td><td>Teleport 200px vorwärts | tötet alles auf dem Weg</td></tr>
         <tr><td>THRUSTER</td><td>Klebt an Gegnern | schleudert nach 3s weg</td></tr>
       </table>
+    </div>
+  </div>
+  <!-- Mobile on-screen controls (shown when game starts on touch device) -->
+  <div id="mctrl">
+    <div style="position:absolute;bottom:16px;left:16px;display:flex;flex-direction:column;gap:5px;align-items:center;">
+      <button class="mc-btn" id="mc-u">▲</button>
+      <div style="display:flex;gap:5px;">
+        <button class="mc-btn" id="mc-l">◀</button>
+        <button class="mc-btn" id="mc-r">▶</button>
+      </div>
+    </div>
+    <div style="position:absolute;bottom:16px;right:16px;display:flex;gap:8px;align-items:flex-end;">
+      <button class="mc-btn" id="mc-pk">PK</button>
+      <button class="mc-btn" id="mc-atk">ATK</button>
     </div>
   </div>
   <script>
@@ -160,27 +180,32 @@ const ctx=canvas.getContext('2d');
 <script src="src/combat.js"></script>
 <script src="src/game.js"></script>
 <script>
-// Touch controls für Mobile — nur auf Canvas, nicht auf UI-Buttons
-const touchState = {};
-const _cvs = document.getElementById('gc');
-_cvs.addEventListener('touchstart', e => {
-  e.preventDefault();
-  Array.from(e.changedTouches).forEach(t => {
-    touchState[t.identifier] = {x: t.clientX, y: t.clientY, startX: t.clientX, startY: t.clientY};
+// Mobile controls: D-Pad + ATK + PK buttons → inject into keys object
+(()=>{
+  // Which keyboard keys to press based on network role
+  const mcKeys=()=>{
+    if(typeof isNetworkMode==='function'&&isNetworkMode())
+      return isNetworkHost()
+        ?{L:'a',R:'d',U:'w',ATK:'f',PK:'g'}
+        :{L:'ArrowLeft',R:'ArrowRight',U:'ArrowUp',ATK:'Enter',PK:'ShiftRight'};
+    return {L:'a',R:'d',U:'w',ATK:'f',PK:'g'}; // local → P1
+  };
+  [['mc-l','L'],['mc-r','R'],['mc-u','U'],['mc-atk','ATK'],['mc-pk','PK']].forEach(([id,action])=>{
+    const btn=document.getElementById(id);
+    if(!btn)return;
+    const press=e=>{e.preventDefault();if(typeof keys!=='undefined')keys[mcKeys()[action]]=true;};
+    const release=e=>{e.preventDefault();if(typeof keys!=='undefined')keys[mcKeys()[action]]=false;};
+    btn.addEventListener('touchstart',press,{passive:false});
+    btn.addEventListener('touchend',release,{passive:false});
+    btn.addEventListener('touchcancel',release,{passive:false});
   });
-}, {passive: false});
-_cvs.addEventListener('touchmove', e => {
-  e.preventDefault();
-  Array.from(e.changedTouches).forEach(t => {
-    if(touchState[t.identifier]) {
-      touchState[t.identifier].x = t.clientX;
-      touchState[t.identifier].y = t.clientY;
-    }
-  });
-}, {passive: false});
-_cvs.addEventListener('touchend', e => {
-  Array.from(e.changedTouches).forEach(t => delete touchState[t.identifier]);
-});
+  // Show controls when game starts on touch device
+  const _orig=window.startGame;
+  window.startGame=(n,mapIdx)=>{
+    _orig(n,mapIdx);
+    if('ontouchstart' in window)document.getElementById('mctrl').style.display='block';
+  };
+})();
 </script>
 </body>
 </html>
