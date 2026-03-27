@@ -15,6 +15,10 @@ class Player{
   }
 
   getInput(){
+    if(typeof isNetworkMode==='function'&&isNetworkMode()){
+      const amRemote=isNetworkHost()?this.id===1:this.id===0;
+      if(amRemote)return typeof getRemoteInput==='function'?getRemoteInput():{L:false,R:false,U:false,A:false,P:false};
+    }
     let L=false,R=false,U=false,A=false,P=false;
     if(!this.active)return{L,R,U,A,P};
     if(this.ctrl){

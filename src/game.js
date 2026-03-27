@@ -57,9 +57,9 @@ const startRound=()=>{
 };
 
 // ── START GAME ─────────────────────────────────────────────────────────────
-window.startGame=n=>{
+window.startGame=(n,mapIdx)=>{
   nP=n;
-  const mi=_selMap===4?(0|Math.random()*MAPS.length):_selMap;
+  const mi=mapIdx!==undefined?mapIdx:(_selMap===4?(0|Math.random()*MAPS.length):_selMap);
   map=MAPS[mi];
   document.getElementById('ts').style.display='none';
   players=Array.from({length:4},(_,i)=>new Player(i,i<n));
@@ -228,6 +228,10 @@ const loop=(timestamp)=>{
   if(roundState!=='fight')drawRoundOverlay(dt);
   if(gameState==='gameover')drawGO(dt);
   if(frame%3===0)drawHUD();
+  if(typeof isNetworkMode==='function'&&isNetworkMode()){
+    const myId=isNetworkHost()?0:1;const p=players[myId];
+    if(p&&p.active)sendNetworkInput(p.getInput());
+  }
 };
 
 requestAnimationFrame(loop);
