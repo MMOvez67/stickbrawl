@@ -17,7 +17,7 @@ html, body {
 #wrap {
   position:relative;
   width:100%;
-  max-width:min(100vw, calc(100vh * 1200/640));
+  max-width: min(100vw, calc(100vh * 1.875));
 }
 canvas {
   display:block;
@@ -36,6 +36,7 @@ canvas {
 #ts {
   position:absolute;
   inset:0;
+  width:100%;
   background:#060810;
   display:flex;
   flex-direction:column;
@@ -100,6 +101,16 @@ canvas {
         <button class="pbtn" onclick="startGame(3)">3P</button>
         <button class="pbtn" onclick="startGame(4)">4P</button>
       </div>
+      <div class="mbtns" style="margin-top:8px;">
+        <label>ONLINE:</label>
+        <button class="pbtn" onclick="hostGame(2)">HOST 2P</button>
+        <span id="room-code-display" style="display:none;color:#FF6B00;font-size:20px;letter-spacing:4px;font-weight:900;padding:0 12px;"></span>
+      </div>
+      <div class="mbtns" style="margin-top:4px;">
+        <input id="join-code-input" placeholder="CODE" maxlength="4"
+          style="background:#0f1c2e;color:#c8dff5;border:1px solid #1a3050;padding:10px 14px;font-size:18px;font-family:'Courier New',monospace;letter-spacing:4px;width:110px;text-align:center;text-transform:uppercase;">
+        <button class="pbtn" onclick="joinGame()">JOIN</button>
+      </div>
       <div class="mbtns" style="margin-top:2px;"><label>MAP:</label>
         <button class="pbtn" id="mb0" onclick="selMap(0)" style="background:#1c3248;border-color:#5090c0;">ROOFTOPS</button>
         <button class="pbtn" id="mb1" onclick="selMap(1)">CASTLE</button>
@@ -130,12 +141,14 @@ canvas {
   </script>
 </div>
 
+<script src="https://unpkg.com/peerjs@1.5.4/dist/peerjs.min.js"></script>
 <script>
 // Canvas — must be first, all modules use ctx as global
 const canvas=document.getElementById('gc');
 const ctx=canvas.getContext('2d');
 </script>
-<!-- Load order: constants → audio → input → particles → maps → weapons → projectiles → player → combat → game -->
+<!-- Load order: network → constants → audio → input → particles → maps → weapons → projectiles → player → combat → game -->
+<script src="src/network.js"></script>
 <script src="src/constants.js"></script>
 <script src="src/audio.js"></script>
 <script src="src/input.js"></script>
@@ -146,5 +159,27 @@ const ctx=canvas.getContext('2d');
 <script src="src/player.js"></script>
 <script src="src/combat.js"></script>
 <script src="src/game.js"></script>
+<script>
+// Touch controls für Mobile
+const touchState = {};
+document.addEventListener('touchstart', e => {
+  e.preventDefault();
+  Array.from(e.changedTouches).forEach(t => {
+    touchState[t.identifier] = {x: t.clientX, y: t.clientY, startX: t.clientX, startY: t.clientY};
+  });
+}, {passive: false});
+document.addEventListener('touchmove', e => {
+  e.preventDefault();
+  Array.from(e.changedTouches).forEach(t => {
+    if(touchState[t.identifier]) {
+      touchState[t.identifier].x = t.clientX;
+      touchState[t.identifier].y = t.clientY;
+    }
+  });
+}, {passive: false});
+document.addEventListener('touchend', e => {
+  Array.from(e.changedTouches).forEach(t => delete touchState[t.identifier]);
+});
+</script>
 </body>
 </html>
