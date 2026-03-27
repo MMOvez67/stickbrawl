@@ -147,5 +147,27 @@ const ctx=canvas.getContext('2d');
 <script src="src/player.js"></script>
 <script src="src/combat.js"></script>
 <script src="src/game.js"></script>
+<script>
+// Touch controls für Mobile
+const touchState = {};
+document.addEventListener('touchstart', e => {
+  e.preventDefault();
+  Array.from(e.changedTouches).forEach(t => {
+    touchState[t.identifier] = {x: t.clientX, y: t.clientY, startX: t.clientX, startY: t.clientY};
+  });
+}, {passive: false});
+document.addEventListener('touchmove', e => {
+  e.preventDefault();
+  Array.from(e.changedTouches).forEach(t => {
+    if(touchState[t.identifier]) {
+      touchState[t.identifier].x = t.clientX;
+      touchState[t.identifier].y = t.clientY;
+    }
+  });
+}, {passive: false});
+document.addEventListener('touchend', e => {
+  Array.from(e.changedTouches).forEach(t => delete touchState[t.identifier]);
+});
+</script>
 </body>
 </html>
