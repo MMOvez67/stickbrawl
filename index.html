@@ -160,15 +160,16 @@ const ctx=canvas.getContext('2d');
 <script src="src/combat.js"></script>
 <script src="src/game.js"></script>
 <script>
-// Touch controls für Mobile
+// Touch controls für Mobile — nur auf Canvas, nicht auf UI-Buttons
 const touchState = {};
-document.addEventListener('touchstart', e => {
+const _cvs = document.getElementById('gc');
+_cvs.addEventListener('touchstart', e => {
   e.preventDefault();
   Array.from(e.changedTouches).forEach(t => {
     touchState[t.identifier] = {x: t.clientX, y: t.clientY, startX: t.clientX, startY: t.clientY};
   });
 }, {passive: false});
-document.addEventListener('touchmove', e => {
+_cvs.addEventListener('touchmove', e => {
   e.preventDefault();
   Array.from(e.changedTouches).forEach(t => {
     if(touchState[t.identifier]) {
@@ -177,7 +178,7 @@ document.addEventListener('touchmove', e => {
     }
   });
 }, {passive: false});
-document.addEventListener('touchend', e => {
+_cvs.addEventListener('touchend', e => {
   Array.from(e.changedTouches).forEach(t => delete touchState[t.identifier]);
 });
 </script>
