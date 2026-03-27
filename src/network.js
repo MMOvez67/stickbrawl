@@ -14,7 +14,7 @@ window.hostGame=playerCount=>{
   peer.on('connection',c=>{
     conn=c;isHost=true;networkMode=true;
     conn.on('open',()=>{
-      const mi=typeof _selMap!=='undefined'&&_selMap!==4?(0|_selMap):(0|Math.random()*5);
+      const mi=typeof _selMap!=='undefined'&&_selMap!==4?(0|_selMap):(0|Math.random()*MAPS.length);
       conn.send({type:'init',mapIdx:mi,playerCount});
       startGame(playerCount,mi);
     });
