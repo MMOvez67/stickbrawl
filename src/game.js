@@ -195,17 +195,7 @@ const loop=(timestamp)=>{
     tickAllParticles(dt);
   }
 
-  const sh=getShake();
-  if(killCamTarget&&slowmo<0.5){
-    killCamZoom=Math.min(killCamZoom+0.04,2.2);
-    const alivePlayer=players.find(p=>p.active&&p.alive);
-    const targetX=alivePlayer?.x||W/2;
-    const targetY=alivePlayer?.y||H/2;
-    killCamTarget.x+=(targetX-killCamTarget.x)*0.04;
-    killCamTarget.y+=(targetY-killCamTarget.y)*0.04;
-  }else killCamZoom=Math.max(killCamZoom-0.06,1.0);
-  const zx=killCamTarget?killCamTarget.x:W/2,zy=killCamTarget?killCamTarget.y:H/2;
-  ctx.save();ctx.translate(sh.x,sh.y);ctx.translate(zx,zy);ctx.scale(killCamZoom,killCamZoom);ctx.translate(-zx,-zy);
+  ctx.save();
   drawMap();
   explosions.forEach(e=>e.draw());for(let i=explosions.length-1;i>=0;i--)if(!explosions[i].active)explosions.splice(i,1);
   thrownWpns.forEach(tw=>{if(tw.active)tw.draw();});for(let i=thrownWpns.length-1;i>=0;i--)if(!thrownWpns[i].active)thrownWpns.splice(i,1);
