@@ -85,12 +85,9 @@ class Player{
     }else this.minigunHeld=0;
     this.pA=c.A;
 
-    if(c.P&&!this.pP&&this.weapon)this.chargeT=0;
-    if(c.P&&this.weapon)this.chargeT+=dt;
-    if(!c.P&&this.pP&&this.weapon){
-      const chargeMult=1+Math.min(this.chargeT/120,1);
-      thrownWpns.push(new ThrownWpn(this.x+this.facing*20,this.y-30,this.facing*10*chargeMult,-4,this.id,this.weapon));
-      this.weapon=null;this.ammo=0;this.chargeT=0;
+    if(c.P&&!this.pP&&this.weapon){
+      thrownWpns.push(new ThrownWpn(this.x+this.facing*20,this.y-30,this.facing*10,-4,this.id,this.weapon));
+      this.weapon=null;this.ammo=0;
     }
     this.pP=c.P;
 

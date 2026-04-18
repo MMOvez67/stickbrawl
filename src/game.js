@@ -90,6 +90,7 @@ const checkWin=()=>{
 // ── KILL CAM TRIGGER ───────────────────────────────────────────────────────
 const checkKillCamTrigger=(dt=1)=>{
   if(roundState!=='fight')return;
+  if(players.some(p=>p.active&&!p.alive&&p.stocks>0))return;
   const act=players.filter(p=>p.active&&p.alive);
   if(act.length!==1)return;
   const lastDanger=act[0];

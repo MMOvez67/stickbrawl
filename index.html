@@ -2,6 +2,7 @@
 <html lang="de">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
 <title>StickBrawl</title>
 <style>
 * { margin:0; padding:0; box-sizing:border-box; }
@@ -73,6 +74,12 @@ canvas {
 .mc-btn:active{background:rgba(255,107,0,0.35);border-color:#FF6B00;}
 #mc-atk{background:rgba(255,107,0,0.15);border-color:rgba(255,107,0,0.5);font-size:14px;letter-spacing:1px;font-family:'Courier New',monospace;font-weight:bold;}
 #mc-pk{font-size:12px;letter-spacing:1px;font-family:'Courier New',monospace;}
+@media (orientation:landscape) and (max-height:500px){
+  #hud{padding:3px 12px;font-size:9px;}
+  #wrap{max-width:min(100vw,calc((100vh - 36px) * 1.875));}
+  #mctrl{height:120px;}
+  .mc-btn{width:54px;height:54px;font-size:20px;}
+}
 </style>
 </head>
 <body>
