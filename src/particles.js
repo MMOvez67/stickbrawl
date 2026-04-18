@@ -51,7 +51,7 @@ const drawDusts=()=>{dusts.forEach(d=>{ctx.save();ctx.globalAlpha=d.life*(d.isAi
 // ── SCREEN SHAKE ───────────────────────────────────────────────────────────
 let shakeT=0,shakeStr=0;
 const addShake=(s,d=8)=>{shakeStr=Math.max(shakeStr,s);shakeT=d;};
-const getShake=()=>{if(shakeT<=0)return{x:0,y:0};const s=shakeStr*(shakeT/8);return{x:rnd(-s,s),y:rnd(-s,s)};};
+const getShake=()=>{if(shakeT<=0){shakeStr=0;return{x:0,y:0};}shakeT--;const s=shakeStr*(shakeT/8);return{x:rnd(-s,s),y:rnd(-s,s)};};
 
 // ── TICK ALL ───────────────────────────────────────────────────────────────
-const tickAllParticles=(dt=1)=>{tickPts(dt);tickDnums(dt);tickDusts(dt);tickMuzzles(dt);tickShells(dt);if(shakeT>0)shakeT-=dt;else if(shakeStr>0)shakeStr=0;};
+const tickAllParticles=(dt=1)=>{tickPts(dt);tickDnums(dt);tickDusts(dt);tickMuzzles(dt);tickShells(dt);};
