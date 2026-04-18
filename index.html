@@ -194,14 +194,14 @@ const ctx=canvas.getContext('2d');
     if(typeof isNetworkMode==='function'&&isNetworkMode())
       return isNetworkHost()
         ?{L:'a',R:'d',U:'w',ATK:'f',PK:'g'}
-        :{L:'ArrowLeft',R:'ArrowRight',U:'ArrowUp',ATK:'Enter',PK:'ShiftRight'};
+        :{L:'ArrowLeft',R:'ArrowRight',U:'ArrowUp',ATK:'Enter',PK:'Shift'};
     return {L:'a',R:'d',U:'w',ATK:'f',PK:'g'}; // local → P1
   };
   [['mc-l','L'],['mc-r','R'],['mc-u','U'],['mc-atk','ATK'],['mc-pk','PK']].forEach(([id,action])=>{
     const btn=document.getElementById(id);
     if(!btn)return;
     const press=e=>{e.preventDefault();if(typeof keys!=='undefined')keys[mcKeys()[action]]=true;};
-    const release=e=>{e.preventDefault();if(typeof keys!=='undefined')keys[mcKeys()[action]]=false;};
+    const release=e=>{e.preventDefault();const k=mcKeys()[action];requestAnimationFrame(()=>{if(typeof keys!=='undefined')keys[k]=false;});};
     btn.addEventListener('touchstart',press,{passive:false});
     btn.addEventListener('touchend',release,{passive:false});
     btn.addEventListener('touchcancel',release,{passive:false});
